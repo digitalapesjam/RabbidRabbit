@@ -55,7 +55,7 @@ function scene:createScene( event )
 		end
 	end
   
-  scene:onLevelComplete()
+  -- scene:onLevelComplete()
 end
 
 -- Called immediately after scene has moved onscreen:

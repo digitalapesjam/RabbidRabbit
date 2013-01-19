@@ -2,6 +2,7 @@
 local levelCompleteListener = nil
 local movingPieces = {}
 local howManyAlive = 0
+local capturedHistory = { index=1 }
 local captured = { head = nil, torso = nil, legs = nil }
 
 local function loadPiece(pieceType, pieceName, group)
@@ -13,6 +14,7 @@ local function loadPiece(pieceType, pieceName, group)
 	piece.myName = pieceType .. pieceName
 	piece.myPieceType = pieceType
 	piece.myKind = pieceName
+	piece.bounced = 0
 	group:insert(piece)
 	return piece
 end
@@ -25,6 +27,10 @@ local function createPiecesFor(pieceType, level, group)
 	torso.x, torso.y = math.random(0, display.contentWidth),50
 	legs.x, legs.y = math.random(0, display.contentWidth),50
 
+	head.maxBounceAllowed = 10 - level
+	torso.maxBounceAllowed = 10 - level
+	legs.maxBounceAllowed = 10 - level
+
 	headPhys = {
 		friction = 0.01, bounce = 0.99,
 		radius = head.width - 20
@@ -36,6 +42,14 @@ local function createPiecesFor(pieceType, level, group)
 	}
 
 	return {{shape=head, physics=headPhys}, {shape=torso, physics=torsoPhys}, {shape=legs, physics=legsPhys}}
+end
+
+local function checkCompleted()
+	if (howManyAlive == 0 and not (levelCompleteListener == nil)) then
+		levelCompleteListener()
+		return true
+	end
+	return false
 end
 
 function everySecond(event)
@@ -54,9 +68,8 @@ function everySecond(event)
 						body.isBodyActive = false
 						piece.removed = true
 						howManyAlive = howManyAlive - 1
-						if (howManyAlive == 0 and not (levelCompleteListener == nil)) then
+						if checkCompleted() then
 							timer.cancel(event.source)
-							levelCompleteListener()
 						end
 					end
 				end
@@ -72,6 +85,13 @@ local function sendOutCaptured(head, torso, legs)
 	group:insert(legs)
 	group:insert(torso)
 	group:insert(head)
+
+	capturedHistory[ capturedHistory.index ] = {
+		head = head.myPieceType,
+		torso = head.myPieceType,
+		legs = head.myPieceType
+	}
+	capturedHistory.index = capturedHistory.index + 1
 
 	local function exit()
 		transition.to(group, {time = 700, x = display.contentWidth + 100})
@@ -91,15 +111,30 @@ end
 
 local function setupCollision( body )
 	local function onCollision( self, event )
+		if event.other.myName == "ground" then
+			print("Ground collision " .. self.bounced .. " - " .. self.maxBounceAllowed)
+			self.bounced = self.bounced + 1
+			if self.bounced >= self.maxBounceAllowed then
+				local function remove(_ev)
+					if self.isBodyActive == true then
+						howManyAlive = howManyAlive - 1
+						self.isBodyActive = false
+						self.removed = true
+					end
+				end
+				timer.performWithDelay(1000, remove, 1)
+			end
+		end
 		--print ("Collided with " .. event.other.myName)
-		if event.other.myName == "rabbit" then
+		if event.other.myName == "rabbitSensor" then
 			--print ("Collided rabbit with a " .. self.myKind)
 			if (captured[self.myKind] == nil) then
 				captured[self.myKind] = self
 				local function doWork(_ev)
 					if(self.isBodyActive==true) then
 						self.isBodyActive = false
-						howManyAlive = howManyAlive - 1
+						self.removed = true
+
 						self.x = display.contentWidth - 400
 						self.rotation = 0
 						if self.myKind == "head" then
@@ -112,6 +147,8 @@ local function setupCollision( body )
 							self.y = 350
 						end
 						checkFriendCompletion()
+						howManyAlive = howManyAlive - 1
+						checkCompleted()
 					end
 				end
 				timer.performWithDelay(1000, doWork, 1)

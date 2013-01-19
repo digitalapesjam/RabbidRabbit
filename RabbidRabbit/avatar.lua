@@ -66,30 +66,6 @@ local function updateAvatarState()
     end
     
     if status == tab_LEFT then
---      motiontabInitPosX,motiontabInitPosY = tab.x,tab.y
---      
---      
---      avatar.xScale = (avatar.x-tab.x)/math.abs(avatar.x-tab.x)
---      
---      distance = math.sqrt(math.pow(avatar.x-tab.x,2)+math.pow(avatar.y-tab.y,2))
---      
---      motionTarget = avatar.x+avatar.xScale*distance
---      
---      if motionTarget < 128 then
---        motionTarget = 128
---        end
---        
---      if  motionTarget > screenW-128 then
---        motionTarget = screenW-128
---        end
---        
---      
---      motionDuration = 1000 * distance/(screenW*avatarSpeed)
---      
---      transition.to(avatar, {motionDuration, x=motionTarget})
---      timer.performWithDelay( motionDuration, stopAnimation)
---      motionBegin = system.getTimer()
---      status=MOVING
        motiontabInitPosX,motiontabInitPosY = tab.x,tab.y
        avatar.xScale = -(avatar.x-tab.x)/math.abs(avatar.x-tab.x)
        
@@ -138,6 +114,17 @@ local function updateAvatarState()
     return true
 end
 
+local function createSensor(avatar, group)
+  physics = require "physics"
+  local sensor = display.newRect(avatar.x, avatar.y - (avatar.height/2) - 40, avatar.width, 10)
+  sensor.myName = "rabbitSensor"
+  local function updateSensor(_ev)
+    sensor.x = avatar.x
+  end
+  physics.addBody(sensor, "kinematic", {isSensor = true})
+  Runtime:addEventListener( "enterFrame", updateSensor )
+end
+
 function createAvatar(grp)
  
   group = grp
@@ -170,5 +157,8 @@ function createAvatar(grp)
   tab:addEventListener( "touch", ontabTouch )
   Runtime:addEventListener( "enterFrame", updateAvatarState )
   Runtime:addEventListener( "touch", resetRelease ) 
+
+  createSensor(avatar, group)
+
   return avatar 
 end
