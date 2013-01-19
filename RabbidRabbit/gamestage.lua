@@ -6,6 +6,7 @@ curLevel = 0
 -- include Corona's "physics" library
 physics = require "physics"
 physics.start(); physics.pause()
+-- physics.setDrawMode("hybrid")
 
 -- Include game components
 require "level"
