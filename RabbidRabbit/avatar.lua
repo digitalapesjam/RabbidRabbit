@@ -57,7 +57,7 @@ end
 local function updateAvatarState()
     if status == REST then
       if not stepsChannel == nil then
-      audio.stop(stepsChannel)
+        audio.stop(stepsChannel)
       end
       tab.x = tabXRestPosition()
       tab.y = tabYRestPosition()+10*math.sin(system.getTimer()/150)
