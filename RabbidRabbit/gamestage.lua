@@ -1,18 +1,24 @@
 storyboard = require( "storyboard" )
 scene = storyboard.newScene()
 
+curLevel = 0
+
 -- include Corona's "physics" library
 physics = require "physics"
 physics.start(); physics.pause()
 
 -- Include game components
+require "level"
 require "avatar"
+
 
 -- forward declarations and other locals
 screenW, screenH, halfW = display.contentWidth, display.contentHeight, display.contentWidth*0.5
 
 function scene:createScene( event )
 	local group = self.view
+
+	curLevel = event.params.currentLevel
 
   -- background
 	local background = display.newImageRect( "Images/stagebg.jpg", display.contentWidth, display.contentHeight )
@@ -21,17 +27,27 @@ function scene:createScene( event )
   
   -- avatar
   local av = createAvatar()
-  
-  -- ground level
-  local ground = display.newRect(0,display.contentHeight-50,screenW,50)
-  ground:setFillColor( 20 )
-  ground.alpha = 0.1
-	physics.addBody( ground, "static", { friction=0.3} )
+
+  -- walls
+  local function addWall(x,y, w,h)
+  	local wall = display.newRect(x,y, w,h)
+  	wall:setFillColor(20)
+  	wall.alpha = 0.1
+  	physics.addBody(wall, "static", {friction = 0.3})
+  	group:insert(wall)
+  end
 	
 	-- all display objects must be inserted into group
 	group:insert( background )
-	group:insert( ground)
 	group:insert( av )
+
+	addWall(0,display.contentHeight-50, screenW,50)
+	addWall(0,0, screenW,20)
+	addWall(0,0, 20,screenH)
+	addWall(display.contentWidth-20,0, 20,screenH)
+
+  	createLevel(curLevel, av, group);
+	setLevelCompleteListener( onLevelComplete );
 end
 
 -- Called immediately after scene has moved onscreen:
@@ -52,6 +68,16 @@ function scene:destroyScene( event )
 	
 	package.loaded[physics] = nil
 	physics = nil
+end
+
+function onLevelComplete()
+
+	storyboard.gotoScene( "levelcomplete", {
+		effect = "fade", time = 200,
+		params = {
+			nextLevel = curLevel + 1
+	}
+} )
 end
 
 -----------------------------------------------------------------------------------------
