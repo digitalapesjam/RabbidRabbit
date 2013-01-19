@@ -24,6 +24,7 @@ function scene:createScene( event )
 	local background = display.newImageRect( "Images/stagebg.jpg", display.contentWidth, display.contentHeight )
   background:setReferencePoint( display.TopLeftReferencePoint )
 	background.x, background.y = 0, 0
+  group:insert( background )
   
   -- avatar
   createAvatar(group)
@@ -38,8 +39,6 @@ function scene:createScene( event )
   	group:insert(wall)
   end
 	
-	-- all display objects must be inserted into group
-	group:insert( background )
 
 	addWall("ground", 0,display.contentHeight-50, screenW,50)
 	addWall("ceiling", 0,0, screenW,20)
@@ -55,7 +54,7 @@ function scene:createScene( event )
 		end
 	end
   
-  scene:onLevelComplete()
+  scene:onLevelComplete(nil,nil)
 end
 
 -- Called immediately after scene has moved onscreen:
@@ -78,16 +77,12 @@ function scene:destroyScene( event )
 	physics = nil
 end
 
-function scene:onLevelComplete()
+function scene:onLevelComplete(levDesc, playerPerf)
 
-	storyboard.gotoScene( "levelcomplete", {
-		effect = "fade", time = 200,
+	storyboard.gotoScene ( "levelcomplete", {
+		effect = "fade", time = 200, isModal=true,
 		params = {
-			nextLevel = curLevel + 1,
-      success=true,
-      skill=0,
-      style=0
-	}
+			levelDescription = levDesc, playerPerformance = playerPerf}
 } )
 end
 

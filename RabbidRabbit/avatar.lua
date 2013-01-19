@@ -162,13 +162,13 @@ function createAvatar(grp)
   tab = display.newImage("Images/thering.png")
   tab.xScale,tab.yScale=0.3,0.3
   
-  group:insert(avatar)
-  group:insert(tab)
-  
   physics.addBody( avatar, { density=1.0, friction=0.3, bounce=0.0, shape={-128,-246,128,-246,128,246,-128,246} } )
   
   tab:addEventListener( "touch", ontabTouch )
   Runtime:addEventListener( "enterFrame", updateAvatarState )
   Runtime:addEventListener( "touch", resetRelease ) 
-  return avatar 
+  
+  group:insert(tab)
+  group:insert(avatar)
+  return true 
 end
