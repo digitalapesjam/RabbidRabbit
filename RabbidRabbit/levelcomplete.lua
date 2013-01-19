@@ -5,7 +5,7 @@ nextLevel = 0
 
 function scene:createScene( event )
 	local group = self.view
-
+  print("new scene")
 	nextLevel = event.params.nextLevel
 end
 

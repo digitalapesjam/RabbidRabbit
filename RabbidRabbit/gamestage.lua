@@ -6,7 +6,6 @@ curLevel = 0
 -- include Corona's "physics" library
 physics = require "physics"
 physics.start(); physics.pause()
--- physics.setDrawMode("hybrid")
 
 -- Include game components
 require "level"
@@ -27,7 +26,7 @@ function scene:createScene( event )
 	background.x, background.y = 0, 0
   
   -- avatar
-  local av = createAvatar()
+  createAvatar(group)
 
   -- walls
   local function addWall(name, x,y, w,h)
@@ -41,7 +40,6 @@ function scene:createScene( event )
 	
 	-- all display objects must be inserted into group
 	group:insert( background )
-	group:insert( av )
 
 	addWall("ground", 0,display.contentHeight-50, screenW,50)
 	addWall("ceiling", 0,0, screenW,20)
@@ -56,6 +54,8 @@ function scene:createScene( event )
 			physics.addBody(piece.shape, "dynamic", piece.physics)
 		end
 	end
+  
+  scene:onLevelComplete()
 end
 
 -- Called immediately after scene has moved onscreen:
@@ -83,7 +83,10 @@ function scene:onLevelComplete()
 	storyboard.gotoScene( "levelcomplete", {
 		effect = "fade", time = 200,
 		params = {
-			nextLevel = curLevel + 1
+			nextLevel = curLevel + 1,
+      success=true,
+      skill=0,
+      style=0
 	}
 } )
 end

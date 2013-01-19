@@ -39,17 +39,17 @@ local function createPiecesFor(pieceType, level, group)
 end
 
 function everySecond(event)
-	print("Check..")
+	--print("Check..")
 	for _i,parts in pairs(movingPieces) do
 		for _j,piece in pairs(parts) do
 			local body = piece.shape
 			if (piece.removed == nil) then
-				print(body.myName .. " y: " .. (display.contentHeight - body.y))
+				--print(body.myName .. " y: " .. (display.contentHeight - body.y))
 				if (display.contentHeight - body.y) < (100+body.height) then
 					local vx,vy = body:getLinearVelocity()
-					print(body.myName .. "vx: " .. vx .. ", vy: " .. vy)
+					--print(body.myName .. "vx: " .. vx .. ", vy: " .. vy)
 					if math.abs(vx) < 2 and math.abs(vy) < 2 then
-						print("Removing " .. body.myName)
+						--print("Removing " .. body.myName)
 						-- body:removeSelf()
 						body.isBodyActive = false
 						piece.removed = true
@@ -66,11 +66,8 @@ function everySecond(event)
 end
 
 local function sendOutCaptured(head, torso, legs)
-	print("Ok")
-
 	torso.y = head.y + (head.height * 0.9)
 	legs.y = torso.y + (torso.height * 0.9)
-
 	local group = display.newGroup()
 	group:insert(legs)
 	group:insert(torso)
@@ -85,7 +82,7 @@ local function checkFriendCompletion()
 	if 	not (captured.head == nil) and
 		not (captured.torso == nil) and
 		not (captured.legs == nil) then
-		print("Friend completed")
+		--print("Friend completed")
 		local head, torso, legs = captured.head, captured.torso, captured.legs
 		captured = {}
 		sendOutCaptured(head, torso, legs)
@@ -94,9 +91,9 @@ end
 
 local function setupCollision( body )
 	local function onCollision( self, event )
-		print ("Collided with " .. event.other.myName)
+		--print ("Collided with " .. event.other.myName)
 		if event.other.myName == "rabbit" then
-			print ("Collided rabbit with a " .. self.myKind)
+			--print ("Collided rabbit with a " .. self.myKind)
 			if (captured[self.myKind] == nil) then
 				captured[self.myKind] = self
 				local function doWork(_ev)
