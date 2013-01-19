@@ -46,8 +46,13 @@ function scene:createScene( event )
 	addWall(0,0, 20,screenH)
 	addWall(display.contentWidth-20,0, 20,screenH)
 
-  	createLevel(curLevel, av, group);
+  	local pieces = createLevel(curLevel, av, group, physics);
 	setLevelCompleteListener( onLevelComplete );
+
+	for i,piece in pairs(pieces) do
+		print(i)
+		physics.addBody(piece, "dynamic", {friction = 0.1})
+	end
 end
 
 -- Called immediately after scene has moved onscreen:
