@@ -9,14 +9,22 @@ local avatarSpeed=0.3
 
 local tab,avatar,line
 
+local pullSound,pullSoundChannel,music,musciChannel
+
+ local function releaseTab()
+    touchOffsetX, touchOffsetY = 0,0
+    status=tab_LEFT
+    audio.stop(pullSoundChannel)
+ end
+
 local function ontabTouch( event )
     if event.phase == "began" then
         touchOffsetX = event.x-event.target.x
         touchOffsetY = event.y-event.target.y
         status = tab_PULLING
+        pullSoundChannel = audio.play(pullSound)
     elseif event.phase == "ended" then
-        touchOffsetX, touchOffsetY = 0,0
-        status=tab_LEFT
+        releaseTab()
     else
       event.target.x, event.target.y = event.x-touchOffsetX, event.y-touchOffsetY
      end
@@ -25,11 +33,11 @@ end
 
 local function resetRelease( event) 
       if event.phase == "ended" and not (status == REST) then
-        touchOffsetX, touchOffsetY = 0,0
-        status=tab_LEFT
+        releaseTab()
       end
       return true
  end 
+
  
  local function stopAnimation( event )
     status=REST
@@ -135,9 +143,10 @@ function createAvatar()
   avatar:play()  
   avatar.x,avatar.y = halfW,screenH-260
   
+  pullSound = audio.loadSound("Audio/pull.mp3")
+  music = audio.loadSound("Audio/soundtrack.mp3")
+  musicChannel = audio.play(music,{loops=-1,fadein=5000})
   
-  -- tab = display.newCircle(avatar.x,avatar.y ,75)
-  -- tab.alpha = 0.1
   tab = display.newImage("Images/thering.png")
   tab.xScale,tab.yScale=0.3,0.3
   
