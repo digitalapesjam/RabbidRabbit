@@ -17,6 +17,7 @@ local function onLabelTouch( event )
     else
       event.target.x, event.target.y = event.x-touchOffsetX, event.y-touchOffsetY
      end
+    print("some touch event")
     return true
 end
 
@@ -35,11 +36,19 @@ end
 function createAvatar()
   
   
-  local imSheet = graphics.newImageSheet( "Images/avatar.png",  { width = 512, height = 512, numFrames = 15} )  
-  avatar = display.newSprite( imSheet, { start=1, count=15} )
+  local imSheet = graphics.newImageSheet( "Images/walk_strip_512.png",  { width = 284, height = 512, numFrames = 8} )  
+  local walkRightSeqData = 
+  {
+    name = "walk_right",
+    start = 1,
+    count = 8,
+    time = 700
+  }
+  avatar = display.newSprite( imSheet, walkRightSeqData )
   avatar:play()  
   avatar.x,avatar.y = halfW,screenH-200
   label = display.newCircle(avatar.x,avatar.y ,75)
+  label.alpha = 0.4
   
   
   label:addEventListener( "touch", onLabelTouch )
