@@ -19,7 +19,10 @@ local playBtn
 local function onPlayBtnRelease()
 	
 	-- go to level1.lua scene
-	storyboard.gotoScene( "gamestage", "fade", 500 )
+	storyboard.gotoScene( "gamestage", {
+		effect = "fade", time = 500, {currentLevel = 1}
+} )
+	-- storyboard.gotoScene( "gamestage", "fade", 500, { currentLevel = 0 } )
 	
 	return true	-- indicates successful touch
 end
