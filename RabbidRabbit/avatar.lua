@@ -5,9 +5,9 @@ local status=tab_REST
 
 local motionBegin, motionDuration, motionTarget, motiontabInitPosX,motiontabInitPosY = 0;
 
-local avatarSpeed=0.5
+local avatarSpeed=0.3
 
-local tab,avatar
+local tab,avatar,line
 
 local function ontabTouch( event )
     if event.phase == "began" then
@@ -46,33 +46,75 @@ end
 local function updateAvatarState()
     if status == REST then
       tab.x = tabXRestPosition()
-      tab.y = tabYRestPosition()
+      tab.y = tabYRestPosition()+10*math.sin(system.getTimer()/150)
     end
     
     if status == tab_LEFT then
-      motiontabInitPosX,motiontabInitPosY = tab.x,tab.y
-      
-      
-      avatar.xScale = (avatar.x-tab.x)/math.abs(avatar.x-tab.x)
-      
-      distance = math.sqrt(math.pow(avatar.x-tab.x,2)+math.pow(avatar.y-tab.y,2))
-      
-      motionTarget = avatar.x+avatar.xScale*distance
+--      motiontabInitPosX,motiontabInitPosY = tab.x,tab.y
+--      
+--      
+--      avatar.xScale = (avatar.x-tab.x)/math.abs(avatar.x-tab.x)
+--      
+--      distance = math.sqrt(math.pow(avatar.x-tab.x,2)+math.pow(avatar.y-tab.y,2))
+--      
+--      motionTarget = avatar.x+avatar.xScale*distance
+--      
+--      if motionTarget < 128 then
+--        motionTarget = 128
+--        end
+--        
+--      if  motionTarget > screenW-128 then
+--        motionTarget = screenW-128
+--        end
+--        
+--      
+--      motionDuration = 1000 * distance/(screenW*avatarSpeed)
+--      
+--      transition.to(avatar, {motionDuration, x=motionTarget})
+--      timer.performWithDelay( motionDuration, stopAnimation)
+--      motionBegin = system.getTimer()
+--      status=MOVING
+       motiontabInitPosX,motiontabInitPosY = tab.x,tab.y
+       avatar.xScale = -(avatar.x-tab.x)/math.abs(avatar.x-tab.x)
+       
+       distance = math.abs(avatar.x-tab.x)
+       motionTarget = tab.x
+       
+      if motionTarget < 128 then
+        motionTarget = 128
+      end
+        
+      if  motionTarget > screenW-128 then
+        motionTarget = screenW-128
+      end
       
       motionDuration = 1000 * distance/(screenW*avatarSpeed)
-      
-      transition.to(avatar, {motionDuration, x=motionTarget})
-      timer.performWithDelay( motionDuration, stopAnimation)
+      transition.to(avatar, {time=motionDuration, x=motionTarget, onComplete=stopAnimation, transition=easing.linear})
       motionBegin = system.getTimer()
       status=MOVING
     end
     
     if status == MOVING then
-     
       local animationState = 1-((system.getTimer()-motionBegin)/motionDuration)
       tab.y = tabYRestPosition() + (motiontabInitPosY-tabYRestPosition())*animationState
       tab.x = tabXRestPosition() + (motiontabInitPosX-tabXRestPosition())*animationState
     end
+    
+    if not (line == nil) then
+      line:removeSelf()
+    end
+    
+    local direction = 1
+    local modifier = 50
+    if avatar.x < tab.x then
+      direction=-1
+    end
+    
+ 
+    line = display.newLine(avatar.x-modifier*direction*0.5,avatar.y,tab.x+modifier*direction,tab.y+modifier)
+    line:setColor(0, 0, 0, 128)
+    line.width = 10
+    avatar:toFront()
     
     return true
 end
@@ -90,10 +132,14 @@ function createAvatar()
   avatar = display.newSprite( imSheet, walkRightSeqData )
   avatar:play()  
   avatar.x,avatar.y = halfW,screenH-260
-  tab = display.newCircle(avatar.x,avatar.y ,75)
-  tab.alpha = 0.1
   
-  physics.addBody( avatar, { density=1.0, friction=0.3, bounce=0.0, shape={-256,-256,256,-256,256,256,-256,256} } )
+  
+  -- tab = display.newCircle(avatar.x,avatar.y ,75)
+  -- tab.alpha = 0.1
+  tab = display.newImage("Images/thering.png")
+  tab.xScale,tab.yScale=0.3,0.3
+  
+  physics.addBody( avatar, { density=1.0, friction=0.3, bounce=0.0, shape={-128,-256,128,-256,128,256,-128,256} } )
   
   tab:addEventListener( "touch", ontabTouch )
   Runtime:addEventListener( "enterFrame", updateAvatarState )
