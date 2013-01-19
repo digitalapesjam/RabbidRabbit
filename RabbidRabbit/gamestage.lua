@@ -1,74 +1,49 @@
------------------------------------------------------------------------------------------
---
--- level1.lua
---
------------------------------------------------------------------------------------------
-
-local storyboard = require( "storyboard" )
-local scene = storyboard.newScene()
+storyboard = require( "storyboard" )
+scene = storyboard.newScene()
 
 -- include Corona's "physics" library
-local physics = require "physics"
+physics = require "physics"
 physics.start(); physics.pause()
 
---------------------------------------------
+-- Include game components
+require "avatar"
 
 -- forward declarations and other locals
-local screenW, screenH, halfW = display.contentWidth, display.contentHeight, display.contentWidth*0.5
+screenW, screenH, halfW = display.contentWidth, display.contentHeight, display.contentWidth*0.5
 
------------------------------------------------------------------------------------------
--- BEGINNING OF YOUR IMPLEMENTATION
--- 
--- NOTE: Code outside of listener functions (below) will only be executed once,
---		 unless storyboard.removeScene() is called.
--- 
------------------------------------------------------------------------------------------
-
--- Called when the scene's view does not exist:
 function scene:createScene( event )
 	local group = self.view
 
-	-- create a grey rectangle as the backdrop
-	local background = display.newRect( 0, 0, screenW, screenH )
-	background:setFillColor( 128 )
-	
-	-- make a crate (off-screen), position it, and rotate slightly
-	local crate = display.newImageRect( "crate.png", 90, 90 )
-	crate.x, crate.y = 160, -100
-	crate.rotation = 15
-	
-	-- add physics to the crate
-	physics.addBody( crate, { density=1.0, friction=0.3, bounce=0.3 } )
-	
-	-- create a grass object and add physics (with custom shape)
-	local grass = display.newImageRect( "grass.png", screenW, 82 )
-	grass:setReferencePoint( display.BottomLeftReferencePoint )
-	grass.x, grass.y = 0, display.contentHeight
-	
-	-- define a shape that's slightly shorter than image bounds (set draw mode to "hybrid" or "debug" to see)
-	local grassShape = { -halfW,-34, halfW,-34, halfW,34, -halfW,34 }
-	physics.addBody( grass, "static", { friction=0.3, shape=grassShape } )
+  -- background
+	local background = display.newImageRect( "Images/stagebg.jpg", display.contentWidth, display.contentHeight )
+  background:setReferencePoint( display.TopLeftReferencePoint )
+	background.x, background.y = 0, 0
+  
+  -- avatar
+  local av = createAvatar()
+  
+  -- ground level
+  local ground = display.newRect(0,display.contentHeight-50,screenW,50)
+  ground:setFillColor( 20 )
+  ground.alpha = 0.1
+	physics.addBody( ground, "static", { friction=0.3} )
 	
 	-- all display objects must be inserted into group
 	group:insert( background )
-	group:insert( grass)
-	group:insert( crate )
+	group:insert( ground)
+	group:insert( av )
 end
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
 	local group = self.view
-	
 	physics.start()
-	
 end
 
 -- Called when scene is about to move offscreen:
 function scene:exitScene( event )
 	local group = self.view
-	
 	physics.stop()
-	
 end
 
 -- If scene's view is removed, scene:destroyScene() will be called just prior to:
