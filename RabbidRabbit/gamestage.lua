@@ -29,9 +29,10 @@ function scene:createScene( event )
   local av = createAvatar()
 
   -- walls
-  local function addWall(x,y, w,h)
+  local function addWall(name, x,y, w,h)
   	local wall = display.newRect(x,y, w,h)
   	wall:setFillColor(20)
+  	wall.myName = name
   	wall.alpha = 0.1
   	physics.addBody(wall, "static", {friction = 0.3})
   	group:insert(wall)
@@ -41,17 +42,18 @@ function scene:createScene( event )
 	group:insert( background )
 	group:insert( av )
 
-	addWall(0,display.contentHeight-50, screenW,50)
-	addWall(0,0, screenW,20)
-	addWall(0,0, 20,screenH)
-	addWall(display.contentWidth-20,0, 20,screenH)
+	addWall("ground", 0,display.contentHeight-50, screenW,50)
+	addWall("ceiling", 0,0, screenW,20)
+	addWall("left", 0,0, 20,screenH)
+	addWall("right", display.contentWidth-20,0, 20,screenH)
 
   	local pieces = createLevel(curLevel, av, group, physics);
-	setLevelCompleteListener( onLevelComplete );
+	setLevelCompleteListener( scene.onLevelComplete );
 
-	for i,piece in pairs(pieces) do
-		print(i)
-		physics.addBody(piece, "dynamic", {friction = 0.1})
+	for _i,parts in pairs(pieces) do
+		for _j,piece in pairs(parts) do
+			physics.addBody(piece.shape, "dynamic", piece.physics)
+		end
 	end
 end
 
@@ -75,7 +77,7 @@ function scene:destroyScene( event )
 	physics = nil
 end
 
-function onLevelComplete()
+function scene:onLevelComplete()
 
 	storyboard.gotoScene( "levelcomplete", {
 		effect = "fade", time = 200,

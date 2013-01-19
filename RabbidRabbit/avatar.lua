@@ -33,7 +33,7 @@ local function resetRelease( event)
  
  local function stopAnimation( event )
     status=REST
-    avatar:setSequence("stand")
+    avatar:setSequence("take")
     avatar:play()
 end
 
@@ -125,10 +125,11 @@ end
 
 function createAvatar()
 
-  local imSheet = graphics.newImageSheet( "Images/stand_walk_512.png",  { width = 284, height = 512, numFrames = 9} )  
+  local imSheet = graphics.newImageSheet( "Images/stand_bring_walk_512.png",  { width = 284, height = 512, numFrames = 10} )  
   local avatarAnimationSequence = {
     { name = "stand", start = 1, count = 1 },
-    { name = "walk",start = 2, count = 8, time = 700 }
+    { name = "take", start = 2, count = 1 },
+    { name = "walk",start = 3, count = 8, time = 700 }
   }
   
   avatar = display.newSprite( imSheet, avatarAnimationSequence )
