@@ -11,6 +11,8 @@ local tab,avatar,line
 
 local pullSound,pullSoundChannel,music,musciChannel,steps,stepsChannel
 
+local group
+
  local function releaseTab()
     touchOffsetX, touchOffsetY = 0,0
     status=tab_LEFT
@@ -136,7 +138,9 @@ local function updateAvatarState()
     return true
 end
 
-function createAvatar()
+function createAvatar(grp)
+ 
+  group = grp
 
   local imSheet = graphics.newImageSheet( "Images/stand_bring_walk_492.png",  { width = 284, height = 492, numFrames = 10} )  
   local avatarAnimationSequence = {
@@ -157,6 +161,9 @@ function createAvatar()
   
   tab = display.newImage("Images/thering.png")
   tab.xScale,tab.yScale=0.3,0.3
+  
+  group:insert(avatar)
+  group:insert(tab)
   
   physics.addBody( avatar, { density=1.0, friction=0.3, bounce=0.0, shape={-128,-246,128,-246,128,246,-128,246} } )
   
