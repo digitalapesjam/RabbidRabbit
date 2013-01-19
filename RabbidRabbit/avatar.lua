@@ -2,11 +2,10 @@ local touchOffsetX, touchOffsetY = 0,0
 
 local tab_PULLING,tab_LEFT,MOVING,REST = 0,1,2
 local status=tab_REST
-local direction = 1
 
 local motionBegin, motionDuration, motionTarget, motiontabInitPosX,motiontabInitPosY = 0;
 
-local avatarSpeed=1
+local avatarSpeed=0.5
 
 local tab,avatar
 
@@ -21,7 +20,6 @@ local function ontabTouch( event )
     else
       event.target.x, event.target.y = event.x-touchOffsetX, event.y-touchOffsetY
      end
-    print("some touch event")
     return true
 end
 
@@ -37,21 +35,29 @@ local function resetRelease( event)
     status=REST
 end
 
+local function tabXRestPosition()
+    return avatar.x-150*avatar.xScale
+end
+
+local function tabYRestPosition()
+    return avatar.y-100
+end
+
 local function updateAvatarState()
     if status == REST then
-      tab.x = avatar.x-20
-      tab.y = avatar.y
+      tab.x = tabXRestPosition()
+      tab.y = tabYRestPosition()
     end
     
     if status == tab_LEFT then
       motiontabInitPosX,motiontabInitPosY = tab.x,tab.y
       
       
-      direction = (avatar.x-tab.x)/math.abs(avatar.x-tab.x)
+      avatar.xScale = (avatar.x-tab.x)/math.abs(avatar.x-tab.x)
       
       distance = math.sqrt(math.pow(avatar.x-tab.x,2)+math.pow(avatar.y-tab.y,2))
       
-      motionTarget = avatar.x+direction*distance
+      motionTarget = avatar.x+avatar.xScale*distance
       
       motionDuration = 1000 * distance/(screenW*avatarSpeed)
       
@@ -59,17 +65,15 @@ local function updateAvatarState()
       timer.performWithDelay( motionDuration, stopAnimation)
       motionBegin = system.getTimer()
       status=MOVING
-      print("transition")
     end
     
     if status == MOVING then
      
       local animationState = 1-((system.getTimer()-motionBegin)/motionDuration)
-      tab.y = avatar.y + (motiontabInitPosY-avatar.y)*animationState
-      tab.x = avatar.x + (motiontabInitPosX-avatar.x)*animationState
-      print(animationState)
+      tab.y = tabYRestPosition() + (motiontabInitPosY-tabYRestPosition())*animationState
+      tab.x = tabXRestPosition() + (motiontabInitPosX-tabXRestPosition())*animationState
     end
-
+    
     return true
 end
 
@@ -85,11 +89,11 @@ function createAvatar()
   }
   avatar = display.newSprite( imSheet, walkRightSeqData )
   avatar:play()  
-  avatar.x,avatar.y = halfW,screenH-200
+  avatar.x,avatar.y = halfW,screenH-260
   tab = display.newCircle(avatar.x,avatar.y ,75)
-  tab.alpha = 0.4
+  tab.alpha = 0.1
   
-  physics.addBody( avatar, { density=1.0, friction=0.3, bounce=0.0, shape={-200,-200,200,-200,200,200,-200,200} } )
+  physics.addBody( avatar, { density=1.0, friction=0.3, bounce=0.0, shape={-256,-256,256,-256,256,256,-256,256} } )
   
   tab:addEventListener( "touch", ontabTouch )
   Runtime:addEventListener( "enterFrame", updateAvatarState )
