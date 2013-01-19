@@ -1,3 +1,5 @@
+require "util"
+
 --local level = 0
 local levelCompleteListener = nil
 local movingPieces = {}
@@ -45,8 +47,13 @@ local function createPiecesFor(pieceType, level, group)
 end
 
 local function checkCompleted()
-	if (howManyAlive == 0 and not (levelCompleteListener == nil)) then
-		levelCompleteListener()
+	for _i,piece in pairs(movingPieces) do
+		if not (piece == nil) then
+			return false
+		end
+	end
+	if not (levelCompleteListener == nil) then
+		levelCompleteListener({1,1,1,1}, capturedHistory)
 		return true
 	end
 	return false
@@ -54,28 +61,33 @@ end
 
 function everySecond(event)
 	--print("Check..")
-	for _i,parts in pairs(movingPieces) do
-		for _j,piece in pairs(parts) do
+	for i,piece in pairs(movingPieces) do
+		if (not (piece == nil)) then
 			local body = piece.shape
-			if (piece.removed == nil) then
-				--print(body.myName .. " y: " .. (display.contentHeight - body.y))
-				if (display.contentHeight - body.y) < (100+body.height) then
-					local vx,vy = body:getLinearVelocity()
-					--print(body.myName .. "vx: " .. vx .. ", vy: " .. vy)
-					if math.abs(vx) < 2 and math.abs(vy) < 2 then
-						--print("Removing " .. body.myName)
-						-- body:removeSelf()
-						body.isBodyActive = false
-						piece.removed = true
-						howManyAlive = howManyAlive - 1
-						if checkCompleted() then
-							timer.cancel(event.source)
-						end
+			--print(body.myName .. " y: " .. (display.contentHeight - body.y))
+			if (display.contentHeight - body.y) < (50+body.height) and
+				not (body['getLinearVelocity'] == nil) then
+				local vx,vy = body:getLinearVelocity()
+				--print(body.myName .. "vx: " .. vx .. ", vy: " .. vy)
+				if math.abs(vx) < 2 and math.abs(vy) < 2 then
+					--print("Removing " .. body.myName)
+					-- body:removeSelf()
+					body.isBodyActive = false
+					movingPieces[i] = nil
+					howManyAlive = howManyAlive - 1
+					if checkCompleted() then
+						timer.cancel(event.source)
 					end
 				end
 			end
 		end
 	end
+
+	-- for i,piece in pairs(movingPieces) do
+	-- 	if not (piece==nil) then
+	-- 		print(i .. " is still alive " .. piece.shape.myName)
+	-- 	end
+	-- end
 end
 
 local function sendOutCaptured(head, torso, legs)
@@ -94,7 +106,10 @@ local function sendOutCaptured(head, torso, legs)
 	capturedHistory.index = capturedHistory.index + 1
 
 	local function exit()
-		transition.to(group, {time = 700, x = display.contentWidth + 100})
+		local function remove()
+			-- group:removeSelf()
+		end
+		transition.to(group, {time = 700, x = display.contentWidth + 100, onComplete = remove})
 	end
 	transition.to(group, {time = 1500, y = display.contentHeight - 500, onComplete = exit})
 end
@@ -109,20 +124,32 @@ local function checkFriendCompletion()
 	end
 end
 
+local function removeFromMoving( body )
+	for i,piece in pairs(movingPieces) do
+		if (not (piece==nil)) then
+			if piece.shape == body then
+				movingPieces[i] = nil
+				return
+			end
+		end
+	end
+end
+
 local function setupCollision( body )
 	local function onCollision( self, event )
 		if event.other.myName == "ground" then
-			print("Ground collision " .. self.bounced .. " - " .. self.maxBounceAllowed)
+			-- print("Ground collision " .. self.bounced .. " - " .. self.maxBounceAllowed)
 			self.bounced = self.bounced + 1
 			if self.bounced >= self.maxBounceAllowed then
 				local function remove(_ev)
 					if self.isBodyActive == true then
 						howManyAlive = howManyAlive - 1
 						self.isBodyActive = false
-						self.removed = true
+						removeFromMoving(self)
+						checkCompleted()
 					end
 				end
-				timer.performWithDelay(1000, remove, 1)
+				timer.performWithDelay(10, remove, 1)
 			end
 		end
 		--print ("Collided with " .. event.other.myName)
@@ -133,7 +160,7 @@ local function setupCollision( body )
 				local function doWork(_ev)
 					if(self.isBodyActive==true) then
 						self.isBodyActive = false
-						self.removed = true
+						removeFromMoving(self)
 
 						self.x = display.contentWidth - 400
 						self.rotation = 0
@@ -151,7 +178,7 @@ local function setupCollision( body )
 						checkCompleted()
 					end
 				end
-				timer.performWithDelay(1000, doWork, 1)
+				timer.performWithDelay(10, doWork, 1)
 			end
 		end
 	end
@@ -165,13 +192,13 @@ local function createItems(level, group)
 	local pieces_2 = createPiecesFor(2, level, group)
 	local pieces_3 = createPiecesFor(3, level, group)
 	local pieces_4 = createPiecesFor(4, level, group)
-	movingPieces = {pieces_1, pieces_2, pieces_3, pieces_4}
-	howManyAlive = 12
+	movingPieces = table.copy(pieces_1, pieces_2, pieces_3, pieces_4)
+	howManyAlive = #movingPieces
 	timer.performWithDelay(1000, everySecond, 0)
-	for _i,parts in pairs(movingPieces) do
-		for _j,piece in pairs(parts) do
+	for _i,piece in pairs(movingPieces) do
+		-- for _j,piece in pairs(parts) do
 			setupCollision(piece.shape)
-		end
+		-- end
 	end
 	return movingPieces
 end

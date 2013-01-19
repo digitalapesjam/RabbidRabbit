@@ -117,6 +117,7 @@ end
 local function createSensor(avatar, group)
   physics = require "physics"
   local sensor = display.newRect(avatar.x, avatar.y - (avatar.height/2) - 40, avatar.width, 10)
+  sensor.alpha = 0
   sensor.myName = "rabbitSensor"
   local function updateSensor(_ev)
     sensor.x = avatar.x
@@ -149,9 +150,6 @@ function createAvatar(grp)
   tab = display.newImage("Images/thering.png")
   tab.xScale,tab.yScale=0.3,0.3
   
-  group:insert(avatar)
-  group:insert(tab)
-  
   physics.addBody( avatar, { density=1.0, friction=0.3, bounce=0.0, shape={-128,-246,128,-246,128,246,-128,246} } )
   
   tab:addEventListener( "touch", ontabTouch )
@@ -159,6 +157,7 @@ function createAvatar(grp)
   Runtime:addEventListener( "touch", resetRelease ) 
 
   createSensor(avatar, group)
-
-  return avatar 
+  group:insert(tab)
+  group:insert(avatar)
+  return true 
 end

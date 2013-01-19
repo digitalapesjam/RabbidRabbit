@@ -1,18 +1,51 @@
 storyboard = require( "storyboard" )
 scene = storyboard.newScene()
 
-nextLevel = 0
+local prevLevelDescription
+local prevPlayerPerformance
+local group
+
+local function drawScore(label,score, x , y, width, height)
+    local myText = display.newText(label, x, y, native.systemFont, 90 )
+    myText:setTextColor(255, 255, 255)
+    
+  
+  	for i = 1,100,25 do
+    local star
+      if score >= i then
+        star = display.newImage("Images/star_on.png")
+      else
+        star = display.newImage("Images/star_off.png")
+      end
+      star.width=width
+      star.height=height
+      star.x = x+star.width*i/25
+      star.y=y
+      group:insert(star)
+    end
+
+  --group:insert(mytext)
+  return true
+end
+
 
 function scene:createScene( event )
-	local group = self.view
-  print("new scene")
-	nextLevel = event.params.nextLevel
+	group = self.view
+  prevPlayerPerformance = event.params.playerPerformance
+  prevLevelDescription = event.params.levelDescription
+  
+  local style = 50
+  local skill = 50
+  
+  
+  drawScore("Style",style,screenW/4,400,100,100)
+  drawScore("Skill",skill,2.5*screenW/4,400,100,100)
 end
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
 	local group = self.view
-	storyboard.gotoScene( "gamestage", {params = {currentLevel = nextLevel}} )
+	--storyboard.gotoScene( "gamestage", {params = {currentLevel = nextLevel}} )
 end
 
 -- Called when scene is about to move offscreen:
