@@ -9,7 +9,7 @@ local avatarSpeed=0.3
 
 local tab,avatar,line
 
-local pullSound,pullSoundChannel,music,musciChannel
+local pullSound,pullSoundChannel,music,musciChannel,steps,stepsChannel
 
  local function releaseTab()
     touchOffsetX, touchOffsetY = 0,0
@@ -41,8 +41,9 @@ local function resetRelease( event)
  
  local function stopAnimation( event )
     status=REST
-    avatar:setSequence("take")
+    avatar:setSequence("stand")
     avatar:play()
+    audio.stop(stepsChannel)
 end
 
 local function tabXRestPosition()
@@ -55,6 +56,9 @@ end
 
 local function updateAvatarState()
     if status == REST then
+      if not stepsChannel == nil then
+      audio.stop(stepsChannel)
+      end
       tab.x = tabXRestPosition()
       tab.y = tabYRestPosition()+10*math.sin(system.getTimer()/150)
     end
@@ -104,6 +108,7 @@ local function updateAvatarState()
       status=MOVING
       avatar:setSequence("walk")
       avatar:play()
+      stepsChannel = audio.play(steps,{loops=-1})
     end
     
     if status == MOVING then
@@ -133,20 +138,20 @@ end
 
 function createAvatar()
 
-  local imSheet = graphics.newImageSheet( "Images/stand_bring_walk_512.png",  { width = 284, height = 512, numFrames = 10} )  
+  local imSheet = graphics.newImageSheet( "Images/stand_walk_512.png",  { width = 284, height = 512, numFrames = 9} )  
   local avatarAnimationSequence = {
     { name = "stand", start = 1, count = 1 },
-    { name = "take", start = 2, count = 1 },
-    { name = "walk",start = 3, count = 8, time = 700 }
+    { name = "walk",start = 2, count = 8, time = 700 }
   }
   
   avatar = display.newSprite( imSheet, avatarAnimationSequence )
   avatar:play()  
   avatar.x,avatar.y = halfW,screenH-260
   
+  steps = audio.loadSound("Audio/steps.mp3")
   pullSound = audio.loadSound("Audio/pull.mp3")
   music = audio.loadSound("Audio/soundtrack.mp3")
-  musicChannel = audio.play(music,{loops=-1,fadein=5000})
+  --musicChannel = audio.play(music,{loops=-1,fadein=5000})
   
   tab = display.newImage("Images/thering.png")
   tab.xScale,tab.yScale=0.3,0.3
