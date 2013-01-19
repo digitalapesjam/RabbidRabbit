@@ -33,6 +33,8 @@ local function resetRelease( event)
  
  local function stopAnimation( event )
     status=REST
+    avatar:setSequence("stand")
+    avatar:play()
 end
 
 local function tabXRestPosition()
@@ -92,6 +94,8 @@ local function updateAvatarState()
       transition.to(avatar, {time=motionDuration, x=motionTarget, onComplete=stopAnimation, transition=easing.linear})
       motionBegin = system.getTimer()
       status=MOVING
+      avatar:setSequence("walk")
+      avatar:play()
     end
     
     if status == MOVING then
@@ -121,15 +125,13 @@ end
 
 function createAvatar()
 
-  local imSheet = graphics.newImageSheet( "Images/walk_strip_512.png",  { width = 284, height = 512, numFrames = 8} )  
-  local walkRightSeqData = 
-  {
-    name = "walk_right",
-    start = 1,
-    count = 8,
-    time = 700
+  local imSheet = graphics.newImageSheet( "Images/stand_walk_512.png",  { width = 284, height = 512, numFrames = 9} )  
+  local avatarAnimationSequence = {
+    { name = "stand", start = 1, count = 1 },
+    { name = "walk",start = 2, count = 8, time = 700 }
   }
-  avatar = display.newSprite( imSheet, walkRightSeqData )
+  
+  avatar = display.newSprite( imSheet, avatarAnimationSequence )
   avatar:play()  
   avatar.x,avatar.y = halfW,screenH-260
   
