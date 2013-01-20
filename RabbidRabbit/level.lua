@@ -64,7 +64,7 @@ end
 function everySecond(event)
 	--print("Check..")
 	for i,piece in pairs(movingPieces) do
-		if (not (piece == nil)) then
+		if (not (piece == nil) and not (piece.shape.y == nil) and not (piece.shape.height == nil)) then
 			local body = piece.shape
 			--print(body.myName .. " y: " .. (display.contentHeight - body.y))
 			if (display.contentHeight - body.y) < (50+body.height) and
@@ -82,11 +82,12 @@ function everySecond(event)
 		end
 	end
 
-	-- for i,piece in pairs(movingPieces) do
-	-- 	if not (piece==nil) then
-	-- 		print(i .. " is still alive " .. piece.shape.myName)
-	-- 	end
-	-- end
+	for i,piece in pairs(movingPieces) do
+		if not (piece==nil) then
+			print(i .. " is still alive " .. piece.shape.myName)
+		end
+	end
+	print("foo")
 end
 
 local function sendOutCaptured(head, torso, legs)
@@ -106,7 +107,7 @@ local function sendOutCaptured(head, torso, legs)
 
 	local function exit()
 		local function remove()
-			-- group:removeSelf()
+			group:removeSelf()
 		end
 		transition.to(group, {time = 700, x = display.contentWidth + 100, onComplete = remove})
 	end
@@ -217,6 +218,12 @@ local function createItems(num, intv, group)
 	return movingPieces
 end
 
+function clearLevel()
+	clearLevelTimer()
+end
+function clearLevelTimer()
+	timer.cancel(piecesCheckTimer)
+end
 function createLevel(number, interval, group)
 	return createItems(number, interval, group)
 end
