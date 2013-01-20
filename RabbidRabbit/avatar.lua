@@ -114,14 +114,15 @@ local function updateAvatarState()
     return true
 end
 
+local sensor
+local function updateSensor(_ev)
+  sensor.x = avatar.x
+end
 local function createSensor(avatar, group)
   physics = require "physics"
-  local sensor = display.newRect(avatar.x, avatar.y - (avatar.height/2) - 40, avatar.width, 10)
+  sensor = display.newRect(avatar.x, avatar.y - (avatar.height/2) - 40, avatar.width, 10)
   sensor.alpha = 0
   sensor.myName = "rabbitSensor"
-  local function updateSensor(_ev)
-    sensor.x = avatar.x
-  end
   physics.addBody(sensor, "kinematic", {isSensor = true})
   Runtime:addEventListener( "enterFrame", updateSensor )
 end
@@ -140,6 +141,7 @@ function createAvatar(grp)
   avatar = display.newSprite( imSheet, avatarAnimationSequence )
   avatar.myName = "rabbit"
   avatar:play()  
+  print("createAvatar " .. halfW)
   avatar.x,avatar.y = halfW,screenH-260
   
   steps = audio.loadSound("Audio/steps.mp3")
@@ -167,6 +169,7 @@ function destroyAvatar()
   audio.stop(musicChannel)
   tab:removeEventListener( "touch", ontabTouch )
   Runtime:removeEventListener( "enterFrame", updateAvatarState )
+  Runtime:removeEventListener( "enterFrame", updateSensor)
   Runtime:removeEventListener( "touch", resetRelease ) 
   return true
 end
