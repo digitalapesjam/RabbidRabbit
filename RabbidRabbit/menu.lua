@@ -13,7 +13,7 @@ local widget = require "widget"
 --------------------------------------------
 
 -- forward declarations and other locals
-local playBtn
+local group
 
 -- 'onRelease' event listener for playBtn
 local function onPlayBtnRelease()
@@ -32,38 +32,45 @@ end
 -- 
 -----------------------------------------------------------------------------------------
 
+local function createButton(text,x,y,width,height) 
+      button = display.newRoundedRect(x,y,width,height,20)
+    button.alpha = 0.8
+    group:insert(button)
+    
+    local myText = display.newEmbossedText(text, x, y+(height/2), native.systemFontBold, 50)
+    myText:setReferencePoint(display.CenterReferencePoint)
+    myText:setTextColor(0, 0, 0)
+    myText.x=x+width/2
+    myText.y=y+height/2
+    
+    group:insert(myText)
+    return button
+end
+
+local function playFunction()
+  storyboard.gotoScene("gamestage",{effect="fade",time=200,params={toysNumber=3,interval=2000}})
+end
+
+
+local function updateAnimations()
+  
+end
+
 -- Called when the scene's view does not exist:
 function scene:createScene( event )
-	local group = self.view
+	group = self.view
 
 	-- display a background image
-	local background = display.newImageRect( "background.jpg", display.contentWidth, display.contentHeight )
+	local background = display.newImageRect( "Images/menubg.png", display.contentWidth, display.contentHeight )
 	background:setReferencePoint( display.TopLeftReferencePoint )
 	background.x, background.y = 0, 0
+  group:insert( background )
 	
-	-- create/position logo/title image on upper-half of the screen
-	local titleLogo = display.newImageRect( "logo.png", 264, 42 )
-	titleLogo:setReferencePoint( display.CenterReferencePoint )
-	titleLogo.x = display.contentWidth * 0.5
-	titleLogo.y = 100
+  playBtn = createButton("Play",display.contentWidth*0.75-300,display.contentHeight/2 + 100,400,500)
 	
-	-- create a widget button (which will loads level1.lua on release)
-	playBtn = widget.newButton{
-		label="Play Now",
-		labelColor = { default={255}, over={128} },
-		default="button.png",
-		over="button-over.png",
-		width=154, height=40,
-		onRelease = onPlayBtnRelease	-- event listener function
-	}
-	playBtn:setReferencePoint( display.CenterReferencePoint )
-	playBtn.x = display.contentWidth*0.5
-	playBtn.y = display.contentHeight - 125
-	
-	-- all display objects must be inserted into group
-	group:insert( background )
-	group:insert( titleLogo )
-	group:insert( playBtn )
+  playBtn:addEventListener( "touch", playFunction )
+  Runtime:addEventListener( "enterFrame", updateAnimations )
+--	group:insert( titleLogo )
 end
 
 -- Called immediately after scene has moved onscreen:

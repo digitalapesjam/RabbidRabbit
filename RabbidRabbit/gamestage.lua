@@ -16,6 +16,7 @@ require "avatar"
 screenW, screenH, halfW = display.contentWidth, display.contentHeight, display.contentWidth*0.5
 
 function scene:createScene( event )
+  print("test")
 	local group = self.view
 
 	curLevel = event.params.currentLevel
@@ -72,13 +73,12 @@ end
 -- If scene's view is removed, scene:destroyScene() will be called just prior to:
 function scene:destroyScene( event )
 	local group = self.view
-	
+	destroyAvatar()
 	package.loaded[physics] = nil
 	physics = nil
 end
 
 function scene:onLevelComplete(levDesc, playerPerf)
-
 	storyboard.gotoScene ( "levelcomplete", {
 		effect = "fade", time = 200, isModal=true,
 		params = {

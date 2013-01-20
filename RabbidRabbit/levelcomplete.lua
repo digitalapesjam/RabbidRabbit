@@ -5,9 +5,12 @@ local prevLevelDescription
 local prevPlayerPerformance
 local group
 
-local function drawScore(label,score, x , y, width, height)
-    local myText = display.newText(label, x, y, native.systemFont, 90 )
+local function drawScore(label,score, x , y)
+    local myText = display.newEmbossedText(label, x, y, native.systemFontBold, 90 )
+    myText:setReferencePoint(display.CenterReferencePoint)
     myText:setTextColor(255, 255, 255)
+    myText.x=x
+    myText.y=y
     
   
   	for i = 1,100,25 do
@@ -17,15 +20,44 @@ local function drawScore(label,score, x , y, width, height)
       else
         star = display.newImage("Images/star_off.png")
       end
-      star.width=width
-      star.height=height
-      star.x = x+star.width*i/25
-      star.y=y
+      star.width=150
+      star.height=150
+      star.x = x-240+star.width*i/25
+      star.y=y+200
       group:insert(star)
     end
 
-  --group:insert(mytext)
+  group:insert(myText)
   return true
+end
+
+local function createButton(text,x,y,width,height) 
+      button = display.newRoundedRect(x,y,width,height,20)
+    button.alpha = 0.8
+    group:insert(button)
+    
+    local myText = display.newEmbossedText(text, x, y+(height/2), native.systemFontBold, 50)
+    myText:setReferencePoint(display.CenterReferencePoint)
+    myText:setTextColor(0, 0, 0)
+    myText.x=x+width/2
+    myText.y=y+height/2
+    
+    group:insert(myText)
+    return button
+end
+
+local function displayToys()
+  
+end
+
+local function continueFunction(event) 
+    storyboard.gotoScene( "gamestage", {effect = "fade", time = 200} )
+end
+
+local function quitFunction(event) 
+  if event.phase == "ended" then
+    storyboard.gotoScene( "menu", {effect = "fade", time = 200})
+  end
 end
 
 
@@ -34,18 +66,33 @@ function scene:createScene( event )
   prevPlayerPerformance = event.params.playerPerformance
   prevLevelDescription = event.params.levelDescription
   
-  local style = 50
-  local skill = 50
+  local gameover=false
   
-  
-  drawScore("Style",style,screenW/4,400,100,100)
-  drawScore("Skill",skill,2.5*screenW/4,400,100,100)
+  if not gameover then
+    local background = display.newImageRect( "Images/scorebg.png", display.contentWidth, display.contentHeight )
+    background:setReferencePoint( display.TopLeftReferencePoint )
+    background.x, background.y = 0, 0
+    group:insert( background )
+    
+    local style = 50
+    local skill = 50
+    
+    
+    drawScore("Style",style,0.9*screenW/3,300)
+    drawScore("Skill",skill,2.1*screenW/3,300)
+       
+    continue = createButton("Continue",1550,950,300,200)
+    quit = createButton("Quit",1550,1200,300,200)
+    
+    continue:addEventListener( "touch", continueFunction )
+    quit:addEventListener( "touch", quitFunction )
+  end
 end
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
+  storyboard.removeScene("gamestage")
 	local group = self.view
-	--storyboard.gotoScene( "gamestage", {params = {currentLevel = nextLevel}} )
 end
 
 -- Called when scene is about to move offscreen:

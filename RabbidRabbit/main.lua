@@ -11,4 +11,4 @@ display.setStatusBar( display.HiddenStatusBar )
 local storyboard = require "storyboard"
 
 -- load menu screen
-storyboard.gotoScene( "gamestage", {params = {currentLevel = 1}} )
+storyboard.gotoScene( "menu")

@@ -119,7 +119,7 @@ local function updateAvatarState()
       tab.x = tabXRestPosition() + (motiontabInitPosX-tabXRestPosition())*animationState
     end
     
-    if not (line == nil) then
+    if line then
       line:removeSelf()
     end
     
@@ -133,7 +133,7 @@ local function updateAvatarState()
     line = display.newLine(avatar.x-modifier*direction*0.5,avatar.y,tab.x+modifier*direction,tab.y+modifier)
     line:setColor(0, 0, 0, 128)
     line.width = 10
-    avatar:toFront()
+    group:insert(line)
     
     return true
 end
@@ -171,4 +171,12 @@ function createAvatar(grp)
   group:insert(tab)
   group:insert(avatar)
   return true 
+end
+
+function destroyAvatar()
+  line = nil
+  tab:removeEventListener( "touch", ontabTouch )
+  Runtime:removeEventListener( "enterFrame", updateAvatarState )
+  Runtime:removeEventListener( "touch", resetRelease ) 
+  return true
 end
