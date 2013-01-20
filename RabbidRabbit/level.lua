@@ -8,6 +8,14 @@ local captured = { head = nil, torso = nil, legs = nil }
 local piecesCheckTimer = nil
 local generatedToys = {}
 
+function resetLevel()
+	levelCompleteListener = nil
+	movingPieces = {}
+	capturedHistory = {}
+	captured = {head = nil, torso = nil, legs = nil}
+	piecesCheckTimer = nil
+	generatedToys = {}
+end
 local function loadPiece(pieceType, pieceName, group)
 	local path = "Images/pieces/" .. pieceType .. "_" .. pieceName .. ".png"
 	local img = display.newImage( path )
@@ -55,6 +63,10 @@ local function checkCompleted()
 	end
 	if not (levelCompleteListener == nil) then
 		timer.cancel(piecesCheckTimer)
+		print("Level completed. Captured history: " .. #capturedHistory)
+		for i,c in pairs(capturedHistory) do
+			print(i .. ")" .. c.head .. " - " .. c.torso .. " - " .. c.legs)
+		end
 		levelCompleteListener:onLevelComplete(generatedToys, capturedHistory)
 		return true
 	end
@@ -85,7 +97,7 @@ function everySecond(event)
 	for i,piece in pairs(movingPieces) do
 		if (not (piece == nil) and not (piece.shape.y == nil) and not (piece.shape.height == nil)) then
 			local body = piece.shape
-			if (body.y > 5000) then
+			if (body.y > display.contentHeight or body.y < -100) then
 				body.y = 100
 			end 
 			--print(body.myName .. " y: " .. (display.contentHeight - body.y))
@@ -119,8 +131,8 @@ local function sendOutCaptured(head, torso, legs)
 	local index = #capturedHistory+1
 	capturedHistory[ index ] = {
 		head = head.myPieceType,
-		torso = head.myPieceType,
-		legs = head.myPieceType
+		torso = torso.myPieceType,
+		legs = legs.myPieceType
 	}
 
 	local function exit()
@@ -226,6 +238,7 @@ end
 
 function clearLevel()
 	clearLevelTimer()
+	resetLevel()
 end
 function clearLevelTimer()
 	timer.cancel(piecesCheckTimer)
