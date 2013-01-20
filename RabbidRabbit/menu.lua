@@ -52,7 +52,7 @@ end
 
 
 local function updateAnimations()
-  
+ 
 end
 
 -- Called when the scene's view does not exist:
