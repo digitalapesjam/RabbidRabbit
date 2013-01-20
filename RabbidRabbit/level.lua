@@ -7,6 +7,7 @@ local capturedHistory = {}
 local captured = { head = nil, torso = nil, legs = nil }
 local piecesCheckTimer = nil
 local generatedToys = {}
+local score=0, scoreText
 
 function resetLevel()
 	levelCompleteListener = nil
@@ -67,7 +68,7 @@ local function checkCompleted()
 		for i,c in pairs(capturedHistory) do
 			print(i .. ")" .. c.head .. " - " .. c.torso .. " - " .. c.legs)
 		end
-		levelCompleteListener:onLevelComplete(generatedToys, capturedHistory)
+		levelCompleteListener:onLevelComplete(generatedToys, capturedHistory, score)
 		return true
 	end
 	return false
@@ -121,7 +122,19 @@ function everySecond(event)
 end
 
 local function sendOutCaptured(head, torso, legs)
-	torso.y = head.y + (head.height * 0.9)
+      if not (head == torso) then
+        score = score + 10
+      end
+      if not (torso == legs) then
+        score = score + 10
+      end
+      if not (legs == head) then
+        score = score + 10
+      end
+      scoreText.text = score
+  
+  
+  torso.y = head.y + (head.height * 0.9)
 	legs.y = torso.y + (torso.height * 0.9)
 	local group = display.newGroup()
 	group:insert(legs)
@@ -177,6 +190,9 @@ local function setupCollision( body )
 				captured[self.myKind] = self
 				local function doWork(_ev)
 					if(self.isBodyActive==true) then
+            score = score + 10
+            scoreText.text = score
+            
 						self.isBodyActive = false
 						removeFromMoving(self, false)
 
@@ -243,7 +259,10 @@ end
 function clearLevelTimer()
 	timer.cancel(piecesCheckTimer)
 end
-function createLevel(number, interval, group)
+function createLevel(number, interval, totalScore, group)
+  score = totalScore
+  scoreText = display.newText(score, 150, 100, native.systemFontBold, 90 )
+  group:insert(scoreText)
 	return createItems(number, interval, group)
 end
 

@@ -3,9 +3,12 @@ scene = storyboard.newScene()
 
 local prevLevelDescription
 local prevPlayerPerformance
+local score
 local group
 
 local quit,continue,styleText,skillText,scoreText,gameOverText
+
+local fail=false
 
 local function drawScore(label,score, x , y)
     local myText = display.newEmbossedText(label, x, y, native.systemFontBold, 90 )
@@ -51,7 +54,19 @@ local function createButton(text,x,y,width,height)
 end
 
 local function continueFunction(event) 
-    storyboard.gotoScene( "gamestage", {effect = "fade", time = 200,params={toysNumber=1,interval=2000}} )
+
+  local total = 0
+  for i,n in pairs(prevLevelDescription) do
+      total = total + n
+  end
+
+  
+    if fail then 
+      storyboard.gotoScene( "gamestage", {effect = "fade", time = 200,params={toysNumber=total,interval=2000,totalScore=score}} )
+    else
+      
+      storyboard.gotoScene( "gamestage", {effect = "fade", time = 200,params={toysNumber=total+1,interval=2000,totalScore=score}} )
+    end
 end
 
 local function quitFunction(event) 
@@ -68,32 +83,34 @@ local function removeScore()
     if not (continue == nil) then 
       continue[1]:removeEventListener( "touch", continueFunction )
       for i,n in pairs(continue) do 
-        n:removeSelf()
+          n:removeSelf()
       end
     end
     
     if not (quit == nil) then 
       quit[1]:removeEventListener( "touch", quitFunction )
       for i,n in pairs(quit) do 
-        n:removeSelf()
+          n:removeSelf()
       end
-    end
-   
+    end  
+  
+  if not fail then 
     if not (skillText == nil) then 
       for i,n in pairs(skillText) do 
-        n:removeSelf()
+          n:removeSelf()
       end
     end
     
     if not (styleText == nil) then 
       for i,n in pairs(styleText) do 
-        n:removeSelf()
+          n:removeSelf()
       end
     end
-    
-    if not (gameOverText == nill) then
-      gameOverText:removeSelf()
-    end
+  else
+      if not (gameOverText == nill) then
+        gameOverText:removeSelf()
+      end
+  end
 end
 
 function scene:createScene( event )
@@ -111,6 +128,7 @@ function scene:enterScene( event )
   
   prevPlayerPerformance = event.params.playerPerformance
   prevLevelDescription = event.params.levelDescription
+  score = event.params.totalScore
   
   
   local total = 0
@@ -141,6 +159,7 @@ function scene:enterScene( event )
   
 
   if skill > 0 then    
+    fail=false
     styleText = drawScore("Style",style,0.9*screenW/3,300)
     skillText = drawScore("Skill",skill,2.1*screenW/3,300)
        
@@ -152,7 +171,8 @@ function scene:enterScene( event )
     
     displayToys()
   else
-    gameOverText = display.newEmbossedText("Game Over!", 1024, 300, native.systemFontBold, 180 )
+    fail=true
+    gameOverText = display.newEmbossedText("Fail!", 1024, 300, native.systemFontBold, 180 )
     gameOverText:setReferencePoint(display.CenterReferencePoint)
     gameOverText:setTextColor(255, 255, 255)
     gameOverText.x=1024
