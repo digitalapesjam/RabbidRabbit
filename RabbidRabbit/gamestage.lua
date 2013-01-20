@@ -35,14 +35,14 @@ function scene:createScene( event )
   	physics.addBody(wall, "static", {friction = 0.3})
   	group:insert(wall)
   end
-	
+  
 
 	addWall("ground", 0,display.contentHeight-50, screenW,50)
 	addWall("ceiling", 0,0, screenW,20)
 	addWall("left", 0,0, 20,screenH)
 	addWall("right", display.contentWidth-20,0, 20,screenH)
 
-  	local pieces = createLevel(3, 100, group);
+  	local pieces = createLevel(5, 1000, group);
 	setLevelCompleteListener( scene );
 
 	-- for _j,piece in pairs(pieces) do

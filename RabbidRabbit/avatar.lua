@@ -120,7 +120,7 @@ local function updateSensor(_ev)
 end
 local function createSensor(avatar, group)
   physics = require "physics"
-  sensor = display.newRect(avatar.x, avatar.y - (avatar.height/2) - 40, avatar.width, 10)
+  sensor = display.newRect(avatar.x, avatar.y - (avatar.height/2), avatar.width, 10)
   sensor.alpha = 0
   sensor.myName = "rabbitSensor"
   physics.addBody(sensor, "kinematic", {isSensor = true})
@@ -131,13 +131,14 @@ function createAvatar(grp)
  
   group = grp
 
-  local imSheet = graphics.newImageSheet( "Images/stand_bring_walk_492.png",  { width = 284, height = 492, numFrames = 10} )  
+  local imSheet = graphics.newImageSheet( "Images/stand_bring_walk_512_matrix.png",  { width = 284, height = 512, numFrames = 10} )  
   local avatarAnimationSequence = {
     { name = "stand", start = 1, count = 1 },
     { name = "catch", start = 2, count = 1 },
     { name = "walk",start = 3, count = 8, time = 700 }
   }
   
+
   avatar = display.newSprite( imSheet, avatarAnimationSequence )
   avatar.myName = "rabbit"
   avatar:play()  
@@ -152,7 +153,7 @@ function createAvatar(grp)
   tab = display.newImage("Images/thering.png")
   tab.xScale,tab.yScale=0.3,0.3
   
-  physics.addBody( avatar, { density=1.0, friction=0.3, bounce=0.0, shape={-128,-246,128,-246,128,246,-128,246} } )
+  -- physics.addBody( avatar, { density=1.0, friction=0.3, bounce=0.0, shape={-128,-256,128,-256,128,256,-128,256} } )
   
   tab:addEventListener( "touch", ontabTouch )
   Runtime:addEventListener( "enterFrame", updateAvatarState )
