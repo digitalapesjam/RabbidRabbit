@@ -164,6 +164,9 @@ end
 
 function destroyAvatar()
   line = nil
+  if stepsChannel then
+      audio.stop(musicChannel)
+  end
   audio.stop(musicChannel)
   tab:removeEventListener( "touch", ontabTouch )
   Runtime:removeEventListener( "enterFrame", updateAvatarState )
