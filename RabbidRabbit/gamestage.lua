@@ -15,6 +15,7 @@ screenW, screenH, halfW = display.contentWidth, display.contentHeight, display.c
 
 function scene:createScene( event )
 	local group = self.view
+	-- physics.setDrawMode("hybrid")	
 
   -- background
 	local background = display.newImageRect( "Images/stagebg.jpg", display.contentWidth, display.contentHeight )
@@ -41,7 +42,7 @@ function scene:createScene( event )
 	addWall("left", 0,0, 20,screenH)
 	addWall("right", display.contentWidth-20,0, 20,screenH)
 
-  	local pieces = createLevel(3, 1000, group);
+  	local pieces = createLevel(3, 100, group);
 	setLevelCompleteListener( scene.onLevelComplete );
 
 	-- for _j,piece in pairs(pieces) do
@@ -69,6 +70,7 @@ function scene:destroyScene( event )
 	local group = self.view
 	destroyAvatar()
 	clearLevel()
+	physics.stop()
 	package.loaded[physics] = nil
 	physics = nil
 end
