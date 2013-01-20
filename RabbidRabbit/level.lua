@@ -6,6 +6,7 @@ local movingPieces = {}
 local capturedHistory = { index=1 }
 local captured = { head = nil, torso = nil, legs = nil }
 local piecesCheckTimer = nil
+local generatedToys = {}
 
 local function loadPiece(pieceType, pieceName, group)
 	local path = "Images/pieces/" .. pieceType .. "_" .. pieceName .. ".png"
@@ -54,7 +55,7 @@ local function checkCompleted()
 	end
 	if not (levelCompleteListener == nil) then
 		timer.cancel(piecesCheckTimer)
-		levelCompleteListener({1,1,1,1}, capturedHistory)
+		levelCompleteListener(generatedToys, capturedHistory)
 		return true
 	end
 	return false
@@ -194,16 +195,15 @@ end
 
 local function createItems(num, intv, group)
 	-- load images
+	for i = 1,6,1 do
+		generatedToys[i] = 0
+	end
 	for _i = 1,num,1 do
 		local idx = math.random(1,6)
+		generatedToys[idx] = generatedToys[idx] + 1
 		local pieces = createPiecesFor(idx, level, group)
 		movingPieces = table.copy(movingPieces, pieces)
 	end
-	-- local pieces_1 = createPiecesFor(1, level, group)
-	-- local pieces_2 = createPiecesFor(2, level, group)
-	-- local pieces_3 = createPiecesFor(3, level, group)
-	-- local pieces_4 = createPiecesFor(4, level, group)
-	-- movingPieces = table.copy(pieces_1, pieces_2, pieces_3, pieces_4)
 	local howManyAlive = #movingPieces
 	piecesCheckTimer = timer.performWithDelay(1000, everySecond, 0)
 	local physics = require "physics"
