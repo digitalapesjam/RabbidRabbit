@@ -3,9 +3,9 @@ require "util"
 --local level = 0
 local levelCompleteListener = nil
 local movingPieces = {}
-local howManyAlive = 0
 local capturedHistory = { index=1 }
 local captured = { head = nil, torso = nil, legs = nil }
+local piecesCheckTimer = nil
 
 local function loadPiece(pieceType, pieceName, group)
 	local path = "Images/pieces/" .. pieceType .. "_" .. pieceName .. ".png"
@@ -54,6 +54,7 @@ local function checkCompleted()
 		end
 	end
 	if not (levelCompleteListener == nil) then
+		timer.cancel(piecesCheckTimer)
 		levelCompleteListener({1,1,1,1}, capturedHistory)
 		return true
 	end
@@ -75,10 +76,7 @@ function everySecond(event)
 					-- body:removeSelf()
 					body.isBodyActive = false
 					movingPieces[i] = nil
-					howManyAlive = howManyAlive - 1
-					if checkCompleted() then
-						timer.cancel(event.source)
-					end
+					checkCompleted()
 				end
 			end
 		end
@@ -144,7 +142,6 @@ local function setupCollision( body )
 			if self.bounced >= self.maxBounceAllowed then
 				local function remove(_ev)
 					if self.isBodyActive == true then
-						howManyAlive = howManyAlive - 1
 						self.isBodyActive = false
 						removeFromMoving(self)
 						checkCompleted()
@@ -175,7 +172,6 @@ local function setupCollision( body )
 							self.y = 350
 						end
 						checkFriendCompletion()
-						howManyAlive = howManyAlive - 1
 						checkCompleted()
 					end
 				end
@@ -191,7 +187,7 @@ end
 local function createItems(num, intv, group)
 	-- load images
 	for _i = 1,num,1 do
-		local idx = math.random(1,4)
+		local idx = math.random(1,6)
 		local pieces = createPiecesFor(idx, level, group)
 		movingPieces = table.copy(movingPieces, pieces)
 	end
@@ -200,8 +196,8 @@ local function createItems(num, intv, group)
 	-- local pieces_3 = createPiecesFor(3, level, group)
 	-- local pieces_4 = createPiecesFor(4, level, group)
 	-- movingPieces = table.copy(pieces_1, pieces_2, pieces_3, pieces_4)
-	howManyAlive = #movingPieces
-	timer.performWithDelay(1000, everySecond, 0)
+	local howManyAlive = #movingPieces
+	piecesCheckTimer = timer.performWithDelay(1000, everySecond, 0)
 	local physics = require "physics"
 
 	local index = 1
