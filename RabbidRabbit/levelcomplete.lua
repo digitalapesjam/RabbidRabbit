@@ -13,8 +13,8 @@ local function drawScore(label,score, x , y)
     myText.y=y
     
   
-  	for i = 1,100,25 do
-    local star
+  	for i = 25,100,25 do
+      local star
       if score >= i then
         star = display.newImage("Images/star_on.png")
       else
@@ -22,7 +22,7 @@ local function drawScore(label,score, x , y)
       end
       star.width=150
       star.height=150
-      star.x = x-240+star.width*i/25
+      star.x = x-240+star.width*(i-25)/25
       star.y=y+200
       group:insert(star)
     end
@@ -67,21 +67,33 @@ end
 
 function scene:createScene( event )
 	group = self.view
+  
+  local background = display.newImageRect( "Images/scorebg.png", display.contentWidth, display.contentHeight )
+  background:setReferencePoint( display.TopLeftReferencePoint )
+  background.x, background.y = 0, 0
+  group:insert( background )
+end
+
+-- Called immediately after scene has moved onscreen:
+function scene:enterScene( event )
+  
+  
   prevPlayerPerformance = event.params.playerPerformance
   prevLevelDescription = event.params.levelDescription
   
+  
+  local total = 0
+  for i,n in pairs(prevLevelDescription) do
+      total = total + n
+  end
+
+  local style = 50
+  local skill = #prevPlayerPerformance*100/total
+  print("Performance:"..#prevPlayerPerformance..", "..total)
+  
   local gameover=false
   
-  if not gameover then
-    local background = display.newImageRect( "Images/scorebg.png", display.contentWidth, display.contentHeight )
-    background:setReferencePoint( display.TopLeftReferencePoint )
-    background.x, background.y = 0, 0
-    group:insert( background )
-    
-    local style = 50
-    local skill = 50
-    
-    
+  if not gameover then    
     drawScore("Style",style,0.9*screenW/3,300)
     drawScore("Skill",skill,2.1*screenW/3,300)
        
@@ -90,18 +102,18 @@ function scene:createScene( event )
     
     continue:addEventListener( "touch", continueFunction )
     quit:addEventListener( "touch", quitFunction )
+    
+    displayToys()
   end
-end
-
--- Called immediately after scene has moved onscreen:
-function scene:enterScene( event )
-  storyboard.removeScene("gamestage")
-  displayToys()
+  
 	local group = self.view
+  storyboard.removeScene("gamestage")
 end
 
 -- Called when scene is about to move offscreen:
 function scene:exitScene( event )
+  continue:removeSelf()
+  quit:removeSelf()
   removeToys()
 	local group = self.view
 end

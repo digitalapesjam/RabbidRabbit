@@ -36,12 +36,12 @@ local function createPiecesFor(pieceType, level, group)
 	legs.maxBounceAllowed = 10 -- level
 
 	headPhys = {
-		friction = 0.01, bounce = 0.4,
+		friction = 0.01, bounce = 0.9,
 		radius = head.width/2
 	}
-	torsoPhys = {friction = 0.01, bounce = 0.4}
+	torsoPhys = {friction = 0.01, bounce = 0.9}
 	legsPhys = {
-		friction = 0.01, bounce = 0.4
+		friction = 0.01, bounce = 0.9
 	}
 
 	return {{shape=head, physics=headPhys}, {shape=torso, physics=torsoPhys}, {shape=legs, physics=legsPhys}}

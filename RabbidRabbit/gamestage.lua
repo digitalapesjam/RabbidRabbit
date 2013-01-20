@@ -79,7 +79,7 @@ function scene:onLevelComplete(levDesc, playerPerf)
 	storyboard.gotoScene ( "levelcomplete", {
 		effect = "fade", time = 200,
 		params = {
-			levelDecription = levelDesc,
+			levelDescription = levDesc,
       playerPerformance = playerPerf
 		}
 	} )
