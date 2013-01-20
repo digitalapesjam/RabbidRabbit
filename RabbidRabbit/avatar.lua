@@ -58,7 +58,7 @@ end
 
 local function updateAvatarState()
     if status == REST then
-      if not stepsChannel == nil then
+      if stepsChannel then
         audio.stop(stepsChannel)
       end
       tab.x = tabXRestPosition()

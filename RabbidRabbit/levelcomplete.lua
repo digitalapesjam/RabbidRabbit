@@ -86,14 +86,30 @@ function scene:enterScene( event )
   for i,n in pairs(prevLevelDescription) do
       total = total + n
   end
+  
+  local entropy = 0
+  for i,n in pairs(prevPlayerPerformance) do
+    
+      if not (n.head == n.torso) then
+        entropy = entropy + 33.4
+      end
+      
+      if not (n.torso == n.legs) then
+        entropy = entropy + 33.4
+      end
+      
+      if not (n.legs == n.head) then
+        entropy = entropy + 33.4
+      end
+  end
 
-  local style = 50
-  local skill = #prevPlayerPerformance*100/total
-  print("Performance:"..#prevPlayerPerformance..", "..total)
+  local style = entropy/#prevPlayerPerformance
+  local skill = 100*#prevPlayerPerformance/total
+  print("Style:"..style..", "..#prevPlayerPerformance)
+  print("Skill:"..skill..", "..total)
   
-  local gameover=false
-  
-  if not gameover then    
+
+  if skill > 0 then    
     drawScore("Style",style,0.9*screenW/3,300)
     drawScore("Skill",skill,2.1*screenW/3,300)
        

@@ -15,7 +15,7 @@ screenW, screenH, halfW = display.contentWidth, display.contentHeight, display.c
 
 function scene:createScene( event )
 	local group = self.view
-	physics.setDrawMode("hybrid")	
+	--physics.setDrawMode("hybrid")	
 
   -- background
 	local background = display.newImageRect( "Images/stagebg.jpg", display.contentWidth, display.contentHeight )
@@ -42,7 +42,7 @@ function scene:createScene( event )
 	addWall("left", 0,0, 20,screenH)
 	addWall("right", display.contentWidth-20,0, 20,screenH)
 
-  	local pieces = createLevel(5, 1000, group);
+  local pieces = createLevel(event.params.toysNumber, event.params.interval, group);
 	setLevelCompleteListener( scene );
 
 	-- for _j,piece in pairs(pieces) do
