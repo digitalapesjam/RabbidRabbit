@@ -49,7 +49,7 @@ end
 
 local function gotoPlay(_ev)
 	storyboard.gotoScene( "gamestage", {
-		effect = "fade", time = 500, params = {toysNumber=1,interval=2000}
+		effect = "fade", time = 500, params = {toysNumber=2,interval=2000,totalScore=0}
 	} )
 end
 

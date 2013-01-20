@@ -42,7 +42,7 @@ function scene:createScene( event )
 	addWall("left", 0,0, 20,screenH)
 	addWall("right", display.contentWidth-20,0, 20,screenH)
 
-  local pieces = createLevel(event.params.toysNumber, event.params.interval, group);
+  local pieces = createLevel(event.params.toysNumber, event.params.interval, event.params.totalScore, group);
 	setLevelCompleteListener( scene );
 
 	-- for _j,piece in pairs(pieces) do
@@ -75,12 +75,13 @@ function scene:destroyScene( event )
 	physics = nil
 end
 
-function scene:onLevelComplete(levDesc, playerPerf)
+function scene:onLevelComplete(levDesc, playerPerf, score)
 	storyboard.gotoScene ( "levelcomplete", {
 		effect = "fade", time = 200,
 		params = {
 			levelDescription = levDesc,
-      playerPerformance = playerPerf
+      playerPerformance = playerPerf,
+      totalScore = score
 		}
 	} )
 end

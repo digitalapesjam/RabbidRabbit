@@ -47,14 +47,13 @@ local function createButton(text,x,y,width,height)
 end
 
 local function playFunction()
-  storyboard.gotoScene("gamestage",{effect="fade",time=200,params={toysNumber=1,interval=2000}})
+  storyboard.gotoScene("gamestage",{effect="fade",time=200,params={toysNumber=1,interval=2000,totalScore=0}})
 end
 
 
 local function updateAnimations()
   
 end
-
 
 -- Called when the scene's view does not exist:
 function scene:createScene( event )
@@ -66,7 +65,7 @@ function scene:createScene( event )
 	background.x, background.y = 0, 0
   group:insert( background )
 	
-  playBtn = createButton("Play",display.contentWidth*0.75-300,display.contentHeight/2 + 100,400,500)
+  playBtn = createButton("Play",display.contentWidth*0.75-300,display.contentHeight/2 + 250,400,400)
 	
   -- playBtn:addEventListener( "touch", playFunction )
   playBtn:addEventListener( "touch", onPlayBtnRelease )
