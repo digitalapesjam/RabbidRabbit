@@ -7,6 +7,7 @@ local capturedHistory = {}
 local captured = { head = nil, torso = nil, legs = nil }
 local piecesCheckTimer = nil
 local generatedToys = {}
+local interval = 0
 
 function resetLevel()
 	levelCompleteListener = nil
@@ -67,7 +68,7 @@ local function checkCompleted()
 		for i,c in pairs(capturedHistory) do
 			print(i .. ")" .. c.head .. " - " .. c.torso .. " - " .. c.legs)
 		end
-		levelCompleteListener:onLevelComplete(generatedToys, capturedHistory)
+		levelCompleteListener:onLevelComplete(generatedToys, capturedHistory, interval)
 		return true
 	end
 	return false
@@ -243,8 +244,9 @@ end
 function clearLevelTimer()
 	timer.cancel(piecesCheckTimer)
 end
-function createLevel(number, interval, group)
-	return createItems(number, interval, group)
+function createLevel(number, launchInterval, group)
+	interval = launchInterval
+	return createItems(number, launchInterval, group)
 end
 
 function setLevelCompleteListener(lst)
