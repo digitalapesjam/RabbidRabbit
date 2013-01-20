@@ -53,7 +53,7 @@ function scene:createScene( event )
 	-- 	physics.addBody(piece.shape, "dynamic", piece.physics)
 	-- end
   
-  --scene:onLevelComplete(nil,nil)
+  scene:onLevelComplete(nil,nil)
 end
 
 -- Called immediately after scene has moved onscreen:
@@ -78,12 +78,10 @@ end
 
 function scene:onLevelComplete(levDesc, playerPerf)
 	storyboard.gotoScene ( "levelcomplete", {
-		effect = "fade", time = 200, isModal=true,
+		effect = "fade", time = 200,
 		params = {
-			nextLevel = curLevel + 1,
-		    success=true,
-    		skill=0,
-    		style=0
+			levelDecription = levelDesc,
+      playerPerformance = playerPerf
 		}
 	} )
 end
