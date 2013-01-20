@@ -35,21 +35,23 @@ local function createPiecesFor(pieceType, level, group)
 	local torso = loadPiece(pieceType, "torso", group)
 	local legs = loadPiece(pieceType, "legs", group)
 
-	head.x, head.y = math.random(0, display.contentWidth),	-100
-	torso.x, torso.y = math.random(0, display.contentWidth),-100
-	legs.x, legs.y = math.random(0, display.contentWidth),	-100
+	local min = display.contentWidth / 20
+	local max = display.contentWidth - min
+	head.x, head.y = math.random(min, max),	-200
+	torso.x, torso.y = math.random(min, max),-200
+	legs.x, legs.y = math.random(min, max),	-200
 
 	head.maxBounceAllowed = 10 -- level
 	torso.maxBounceAllowed = 10 -- level
 	legs.maxBounceAllowed = 10 -- level
 
 	headPhys = {
-		friction = 0.01, bounce = 0.4,
+		friction = 0.01, bounce = 0.3,
 		radius = head.width/2
 	}
-	torsoPhys = {friction = 0.01, bounce = 0.4}
+	torsoPhys = {friction = 0.01, bounce = 0.3}
 	legsPhys = {
-		friction = 0.01, bounce = 0.4
+		friction = 0.01, bounce = 0.3
 	}
 
 	return {{shape=head, physics=headPhys}, {shape=torso, physics=torsoPhys}, {shape=legs, physics=legsPhys}}
@@ -97,13 +99,13 @@ function everySecond(event)
 	for i,piece in pairs(movingPieces) do
 		if (not (piece == nil) and not (piece.shape.y == nil) and not (piece.shape.height == nil)) then
 			local body = piece.shape
-			if (body.y > display.contentHeight or body.y < -100) then
+			if (body.y > display.contentHeight or body.y < -200) then
 				body.y = 100
 			end 
 			--print(body.myName .. " y: " .. (display.contentHeight - body.y))
 			if (not (body['getLinearVelocity']==nil)) then
 				local vx,vy = body:getLinearVelocity()
-				if math.abs(vx) <= 1 and math.abs(vy) <= 1 then
+				if body.y > 100 and  math.abs(vx) <= 1 and math.abs(vy) <= 1 then
 					body.isBodyActive = false
 					removeFromMoving(body, true)
 					checkCompleted()
@@ -209,8 +211,9 @@ local function createItems(num, intv, group)
 	for i = 1,6,1 do
 		generatedToys[i] = 0
 	end
-	for _i = 1,num,1 do
+	for i = 1,num,1 do
 		local idx = math.random(1,6)
+		print(i .. ") generating a " .. idx)
 		generatedToys[idx] = generatedToys[idx] + 1
 		local pieces = createPiecesFor(idx, level, group)
 		movingPieces = table.copy(movingPieces, pieces)
