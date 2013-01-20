@@ -3,7 +3,7 @@ require "util"
 --local level = 0
 local levelCompleteListener = nil
 local movingPieces = {}
-local capturedHistory = { index=1 }
+local capturedHistory = {}
 local captured = { head = nil, torso = nil, legs = nil }
 local piecesCheckTimer = nil
 local generatedToys = {}
@@ -61,6 +61,25 @@ local function checkCompleted()
 	return false
 end
 
+local function removeFromMoving( body, delete )
+	if delete then
+		local function removeBody(_ev)
+			print("Removing " .. body.myName)
+			body:removeSelf()
+			
+		end
+		timer.performWithDelay(100, removeBody, 1)
+	end
+	for i,piece in pairs(movingPieces) do
+		if (not (piece==nil)) then
+			if piece.shape == body then
+				movingPieces[i] = nil
+				return
+			end
+		end
+	end
+end
+
 function everySecond(event)
 	--print("Check..")
 	for i,piece in pairs(movingPieces) do
@@ -70,17 +89,25 @@ function everySecond(event)
 				body.y = 100
 			end 
 			--print(body.myName .. " y: " .. (display.contentHeight - body.y))
-			if (display.contentHeight - body.y) < (100+body.height) and
-				not (body['getLinearVelocity'] == nil) then
+			if (not (body['getLinearVelocity']==nil)) then
 				local vx,vy = body:getLinearVelocity()
-				--print(body.myName .. "vx: " .. vx .. ", vy: " .. vy)
-				if math.abs(vx) < 2 and math.abs(vy) < 2 then
-					--print("Removing " .. body.myName)
+				if math.abs(vx) <= 1 and math.abs(vy) <= 1 then
 					body.isBodyActive = false
-					movingPieces[i] = nil
+					removeFromMoving(body, true)
 					checkCompleted()
 				end
 			end
+			-- if (display.contentHeight - body.y) < ((display.contentHeight/10)+body.height) and
+			-- 	not (body['getLinearVelocity'] == nil) then
+			-- 	local vx,vy = body:getLinearVelocity()
+			-- 	--print(body.myName .. "vx: " .. vx .. ", vy: " .. vy)
+			-- 	if math.abs(vx) < 2 and math.abs(vy) < 2 then
+			-- 		--print("Removing " .. body.myName)
+			-- 		body.isBodyActive = false
+			-- 		movingPieces[i] = nil
+			-- 		checkCompleted()
+			-- 	end
+			-- end
 		end
 	end
 
@@ -100,12 +127,12 @@ local function sendOutCaptured(head, torso, legs)
 	group:insert(torso)
 	group:insert(head)
 
-	capturedHistory[ capturedHistory.index ] = {
+	local index = #capturedHistory+1
+	capturedHistory[ index ] = {
 		head = head.myPieceType,
 		torso = head.myPieceType,
 		legs = head.myPieceType
 	}
-	capturedHistory.index = capturedHistory.index + 1
 
 	local function exit()
 		local function remove()
@@ -126,17 +153,6 @@ local function checkFriendCompletion()
 	end
 end
 
-local function removeFromMoving( body )
-	for i,piece in pairs(movingPieces) do
-		if (not (piece==nil)) then
-			if piece.shape == body then
-				movingPieces[i] = nil
-				return
-			end
-		end
-	end
-end
-
 local function setupCollision( body )
 	local function onCollision( self, event )
 		if event.other.myName == "ground" then
@@ -146,13 +162,7 @@ local function setupCollision( body )
 				local function remove(_ev)
 					if self.isBodyActive == true then
 						self.isBodyActive = false
-						removeFromMoving(self)
-						local function removeBody(_ev)
-							print("Removing " .. body.myName)
-							body:removeSelf()
-							
-						end
-						timer.performWithDelay(100, removeBody, 1)
+						removeFromMoving(self, true)
 						checkCompleted()
 					end
 				end
@@ -167,7 +177,7 @@ local function setupCollision( body )
 				local function doWork(_ev)
 					if(self.isBodyActive==true) then
 						self.isBodyActive = false
-						removeFromMoving(self)
+						removeFromMoving(self, false)
 
 						self.x = display.contentWidth - 400
 						self.rotation = 0
