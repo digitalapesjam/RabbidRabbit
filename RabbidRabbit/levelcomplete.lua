@@ -5,6 +5,8 @@ local prevLevelDescription
 local prevPlayerPerformance
 local group
 
+local quit,continue,styleText,skillText,scoreText,gameOverText
+
 local function drawScore(label,score, x , y)
     local myText = display.newEmbossedText(label, x, y, native.systemFontBold, 90 )
     myText:setReferencePoint(display.CenterReferencePoint)
@@ -12,6 +14,7 @@ local function drawScore(label,score, x , y)
     myText.x=x
     myText.y=y
     
+    list = {myText}
   
   	for i = 25,100,25 do
       local star
@@ -25,14 +28,15 @@ local function drawScore(label,score, x , y)
       star.x = x-240+star.width*(i-25)/25
       star.y=y+200
       group:insert(star)
+      list[#list+1] = star
     end
 
   group:insert(myText)
-  return true
+  return list
 end
 
 local function createButton(text,x,y,width,height) 
-      button = display.newRoundedRect(x,y,width,height,20)
+    button = display.newRoundedRect(x,y,width,height,20)
     button.alpha = 0.8
     group:insert(button)
     
@@ -43,19 +47,11 @@ local function createButton(text,x,y,width,height)
     myText.y=y+height/2
     
     group:insert(myText)
-    return button
-end
-
-local function displayToys()
-  
-end
-
-local function removeToys()
-  
+    return {button,myText}
 end
 
 local function continueFunction(event) 
-    storyboard.gotoScene( "gamestage", {effect = "fade", time = 200} )
+    storyboard.gotoScene( "gamestage", {effect = "fade", time = 200,params={toysNumber=1,interval=2000}} )
 end
 
 local function quitFunction(event) 
@@ -64,6 +60,41 @@ local function quitFunction(event)
   end
 end
 
+local function displayToys()
+  
+end
+
+local function removeScore()
+    if not (continue == nil) then 
+      continue[1]:removeEventListener( "touch", continueFunction )
+      for i,n in pairs(continue) do 
+        n:removeSelf()
+      end
+    end
+    
+    if not (quit == nil) then 
+      quit[1]:removeEventListener( "touch", quitFunction )
+      for i,n in pairs(quit) do 
+        n:removeSelf()
+      end
+    end
+   
+    if not (skillText == nil) then 
+      for i,n in pairs(skillText) do 
+        n:removeSelf()
+      end
+    end
+    
+    if not (styleText == nil) then 
+      for i,n in pairs(styleText) do 
+        n:removeSelf()
+      end
+    end
+    
+    if not (gameOverText == nill) then
+      gameOverText:removeSelf()
+    end
+end
 
 function scene:createScene( event )
 	group = self.view
@@ -76,7 +107,7 @@ end
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-  
+  group = self.view
   
   prevPlayerPerformance = event.params.playerPerformance
   prevLevelDescription = event.params.levelDescription
@@ -110,28 +141,36 @@ function scene:enterScene( event )
   
 
   if skill > 0 then    
-    drawScore("Style",style,0.9*screenW/3,300)
-    drawScore("Skill",skill,2.1*screenW/3,300)
+    styleText = drawScore("Style",style,0.9*screenW/3,300)
+    skillText = drawScore("Skill",skill,2.1*screenW/3,300)
        
     continue = createButton("Continue",1550,950,300,200)
     quit = createButton("Quit",1550,1200,300,200)
     
-    continue:addEventListener( "touch", continueFunction )
-    quit:addEventListener( "touch", quitFunction )
+    continue[1]:addEventListener( "touch", continueFunction )
+    quit[1]:addEventListener( "touch", quitFunction )
     
     displayToys()
+  else
+    gameOverText = display.newEmbossedText("Game Over!", 1024, 300, native.systemFontBold, 180 )
+    gameOverText:setReferencePoint(display.CenterReferencePoint)
+    gameOverText:setTextColor(255, 255, 255)
+    gameOverText.x=1024
+    gameOverText.y=300
+    
+    continue = createButton("Retry",850,950,300,200)
+    quit = createButton("Quit",850,1200,300,200)
+    
+    continue[1]:addEventListener( "touch", continueFunction )
+    quit[1]:addEventListener( "touch", quitFunction )
   end
   
-	local group = self.view
   storyboard.removeScene("gamestage")
 end
 
 -- Called when scene is about to move offscreen:
-function scene:exitScene( event )
-  continue:removeSelf()
-  quit:removeSelf()
-  removeToys()
-	local group = self.view
+function scene:exitScene( event )    
+  removeScore()
 end
 
 -- If scene's view is removed, scene:destroyScene() will be called just prior to:
