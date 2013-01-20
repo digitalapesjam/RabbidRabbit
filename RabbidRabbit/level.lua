@@ -55,7 +55,7 @@ local function checkCompleted()
 	end
 	if not (levelCompleteListener == nil) then
 		timer.cancel(piecesCheckTimer)
-		levelCompleteListener(generatedToys, capturedHistory)
+		levelCompleteListener:onLevelComplete(generatedToys, capturedHistory)
 		return true
 	end
 	return false
@@ -97,17 +97,6 @@ function everySecond(event)
 					checkCompleted()
 				end
 			end
-			-- if (display.contentHeight - body.y) < ((display.contentHeight/10)+body.height) and
-			-- 	not (body['getLinearVelocity'] == nil) then
-			-- 	local vx,vy = body:getLinearVelocity()
-			-- 	--print(body.myName .. "vx: " .. vx .. ", vy: " .. vy)
-			-- 	if math.abs(vx) < 2 and math.abs(vy) < 2 then
-			-- 		--print("Removing " .. body.myName)
-			-- 		body.isBodyActive = false
-			-- 		movingPieces[i] = nil
-			-- 		checkCompleted()
-			-- 	end
-			-- end
 		end
 	end
 

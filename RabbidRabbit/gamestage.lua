@@ -15,7 +15,7 @@ screenW, screenH, halfW = display.contentWidth, display.contentHeight, display.c
 
 function scene:createScene( event )
 	local group = self.view
-	-- physics.setDrawMode("hybrid")	
+	physics.setDrawMode("hybrid")	
 
   -- background
 	local background = display.newImageRect( "Images/stagebg.jpg", display.contentWidth, display.contentHeight )
@@ -43,7 +43,7 @@ function scene:createScene( event )
 	addWall("right", display.contentWidth-20,0, 20,screenH)
 
   	local pieces = createLevel(3, 100, group);
-	setLevelCompleteListener( scene.onLevelComplete );
+	setLevelCompleteListener( scene );
 
 	-- for _j,piece in pairs(pieces) do
 	-- 	physics.addBody(piece.shape, "dynamic", piece.physics)
