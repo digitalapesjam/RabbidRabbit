@@ -35,9 +35,9 @@ local function createPiecesFor(pieceType, level, group)
 	local torso = loadPiece(pieceType, "torso", group)
 	local legs = loadPiece(pieceType, "legs", group)
 
-	head.x, head.y = math.random(0, display.contentWidth),	-100
-	torso.x, torso.y = math.random(0, display.contentWidth),-100
-	legs.x, legs.y = math.random(0, display.contentWidth),	-100
+	head.x, head.y = math.random(0, display.contentWidth),	-200
+	torso.x, torso.y = math.random(0, display.contentWidth),-200
+	legs.x, legs.y = math.random(0, display.contentWidth),	-200
 
 	head.maxBounceAllowed = 10 -- level
 	torso.maxBounceAllowed = 10 -- level
@@ -97,13 +97,13 @@ function everySecond(event)
 	for i,piece in pairs(movingPieces) do
 		if (not (piece == nil) and not (piece.shape.y == nil) and not (piece.shape.height == nil)) then
 			local body = piece.shape
-			if (body.y > display.contentHeight or body.y < -100) then
+			if (body.y > display.contentHeight or body.y < -200) then
 				body.y = 100
 			end 
 			--print(body.myName .. " y: " .. (display.contentHeight - body.y))
 			if (not (body['getLinearVelocity']==nil)) then
 				local vx,vy = body:getLinearVelocity()
-				if math.abs(vx) <= 1 and math.abs(vy) <= 1 then
+				if body.y > 200 and math.abs(vx) <= 1 and math.abs(vy) <= 1 then
 					body.isBodyActive = false
 					removeFromMoving(body, true)
 					checkCompleted()
