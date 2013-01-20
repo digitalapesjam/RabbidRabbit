@@ -48,7 +48,7 @@ local function createButton(text,x,y,width,height)
 end
 
 local function playFunction()
-  storyboard.gotoScene("gamestage",{effect="fade",time=200,params={toysNumber=3,interval=2000}})
+  storyboard.gotoScene("gamestage",{effect="fade",time=200,params={toysNumber=1,interval=2000}})
 end
 
 
