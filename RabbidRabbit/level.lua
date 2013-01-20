@@ -17,6 +17,7 @@ local function loadPiece(pieceType, pieceName, group)
 	piece.myPieceType = pieceType
 	piece.myKind = pieceName
 	piece.bounced = 0
+	piece.rotation = math.random(0,360)
 	group:insert(piece)
 	return piece
 end
@@ -25,13 +26,13 @@ local function createPiecesFor(pieceType, level, group)
 	local torso = loadPiece(pieceType, "torso", group)
 	local legs = loadPiece(pieceType, "legs", group)
 
-	head.x, head.y = math.random(0, display.contentWidth),50
-	torso.x, torso.y = math.random(0, display.contentWidth),50
-	legs.x, legs.y = math.random(0, display.contentWidth),50
+	head.x, head.y = math.random(0, display.contentWidth),	-100
+	torso.x, torso.y = math.random(0, display.contentWidth),-100
+	legs.x, legs.y = math.random(0, display.contentWidth),	-100
 
-	head.maxBounceAllowed = 10 - level
-	torso.maxBounceAllowed = 10 - level
-	legs.maxBounceAllowed = 10 - level
+	head.maxBounceAllowed = 10 -- level
+	torso.maxBounceAllowed = 10 -- level
+	legs.maxBounceAllowed = 10 -- level
 
 	headPhys = {
 		friction = 0.01, bounce = 0.99,
@@ -186,25 +187,42 @@ local function setupCollision( body )
 	body:addEventListener("collision", body)
 end
 
-local function createItems(level, group)
+
+local function createItems(num, intv, group)
 	-- load images
-	local pieces_1 = createPiecesFor(1, level, group)
-	local pieces_2 = createPiecesFor(2, level, group)
-	local pieces_3 = createPiecesFor(3, level, group)
-	local pieces_4 = createPiecesFor(4, level, group)
-	movingPieces = table.copy(pieces_1, pieces_2, pieces_3, pieces_4)
+	for _i = 1,num,1 do
+		local idx = math.random(1,4)
+		local pieces = createPiecesFor(idx, level, group)
+		movingPieces = table.copy(movingPieces, pieces)
+	end
+	-- local pieces_1 = createPiecesFor(1, level, group)
+	-- local pieces_2 = createPiecesFor(2, level, group)
+	-- local pieces_3 = createPiecesFor(3, level, group)
+	-- local pieces_4 = createPiecesFor(4, level, group)
+	-- movingPieces = table.copy(pieces_1, pieces_2, pieces_3, pieces_4)
 	howManyAlive = #movingPieces
 	timer.performWithDelay(1000, everySecond, 0)
-	for _i,piece in pairs(movingPieces) do
-		-- for _j,piece in pairs(parts) do
-			setupCollision(piece.shape)
-		-- end
+	local physics = require "physics"
+
+	local index = 1
+	local function launch(_ev)
+		local obj = movingPieces[index]
+		index = index + 1
+		obj.shape.y = 50
+		obj.physics.filter = {groupIndex = -2}
+		physics.addBody(obj.shape, "dynamic", obj.physics)
+		setupCollision(obj.shape)
 	end
+	timer.performWithDelay(intv, launch, #movingPieces)
+	-- for _i,piece in pairs(movingPieces) do
+	-- 	physics.addBody(piece.shape, "dynamic", piece.physics)
+	-- 	setupCollision(piece.shape)
+	-- end
 	return movingPieces
 end
 
-function createLevel(level, rabbit, group, physics)
-	return createItems(level, group)
+function createLevel(number, interval, group)
+	return createItems(number, interval, group)
 end
 
 function setLevelCompleteListener(lst)

@@ -45,13 +45,11 @@ function scene:createScene( event )
 	addWall("left", 0,0, 20,screenH)
 	addWall("right", display.contentWidth-20,0, 20,screenH)
 
-  	local pieces = createLevel(curLevel, av, group, physics);
+  	local pieces = createLevel(12, 1000, group);
 	setLevelCompleteListener( scene.onLevelComplete );
 
-	-- for _i,parts in pairs(pieces) do
-		for _j,piece in pairs(pieces) do
-			physics.addBody(piece.shape, "dynamic", piece.physics)
-		end
+	-- for _j,piece in pairs(pieces) do
+	-- 	physics.addBody(piece.shape, "dynamic", piece.physics)
 	-- end
   
   --scene:onLevelComplete(nil,nil)
