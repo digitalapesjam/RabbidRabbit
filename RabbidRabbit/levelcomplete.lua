@@ -50,6 +50,10 @@ local function displayToys()
   
 end
 
+local function removeToys()
+  
+end
+
 local function continueFunction(event) 
     storyboard.gotoScene( "gamestage", {effect = "fade", time = 200} )
 end
@@ -92,11 +96,13 @@ end
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
   storyboard.removeScene("gamestage")
+  displayToys()
 	local group = self.view
 end
 
 -- Called when scene is about to move offscreen:
 function scene:exitScene( event )
+  removeToys()
 	local group = self.view
 end
 

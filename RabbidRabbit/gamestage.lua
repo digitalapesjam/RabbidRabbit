@@ -16,7 +16,6 @@ require "avatar"
 screenW, screenH, halfW = display.contentWidth, display.contentHeight, display.contentWidth*0.5
 
 function scene:createScene( event )
-  print("test")
 	local group = self.view
 
 	curLevel = event.params.currentLevel

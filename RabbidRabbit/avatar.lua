@@ -145,7 +145,7 @@ function createAvatar(grp)
   steps = audio.loadSound("Audio/steps.mp3")
   pullSound = audio.loadSound("Audio/pull.mp3")
   music = audio.loadSound("Audio/soundtrack.mp3")
-  --musicChannel = audio.play(music,{loops=-1,fadein=5000})
+  musicChannel = audio.play(music,{loops=-1,fadein=5000})
   
   tab = display.newImage("Images/thering.png")
   tab.xScale,tab.yScale=0.3,0.3
@@ -164,6 +164,7 @@ end
 
 function destroyAvatar()
   line = nil
+  audio.stop(musicChannel)
   tab:removeEventListener( "touch", ontabTouch )
   Runtime:removeEventListener( "enterFrame", updateAvatarState )
   Runtime:removeEventListener( "touch", resetRelease ) 
