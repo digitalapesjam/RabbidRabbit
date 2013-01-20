@@ -35,13 +35,12 @@ local function createPiecesFor(pieceType, level, group)
 	legs.maxBounceAllowed = 10 -- level
 
 	headPhys = {
-		friction = 0.01, bounce = 0.99,
-		radius = head.width - 20
+		friction = 0.01, bounce = 0.4,
+		radius = head.width/2
 	}
-	torsoPhys = {friction = 0.01, bounce = 0.99}
+	torsoPhys = {friction = 0.01, bounce = 0.4}
 	legsPhys = {
-		friction = 0.01, bounce = 0.99
-		-- radius = 180
+		friction = 0.01, bounce = 0.4
 	}
 
 	return {{shape=head, physics=headPhys}, {shape=torso, physics=torsoPhys}, {shape=legs, physics=legsPhys}}
@@ -66,14 +65,16 @@ function everySecond(event)
 	for i,piece in pairs(movingPieces) do
 		if (not (piece == nil) and not (piece.shape.y == nil) and not (piece.shape.height == nil)) then
 			local body = piece.shape
+			if (body.y > 5000) then
+				body.y = 100
+			end 
 			--print(body.myName .. " y: " .. (display.contentHeight - body.y))
-			if (display.contentHeight - body.y) < (50+body.height) and
+			if (display.contentHeight - body.y) < (100+body.height) and
 				not (body['getLinearVelocity'] == nil) then
 				local vx,vy = body:getLinearVelocity()
 				--print(body.myName .. "vx: " .. vx .. ", vy: " .. vy)
 				if math.abs(vx) < 2 and math.abs(vy) < 2 then
 					--print("Removing " .. body.myName)
-					-- body:removeSelf()
 					body.isBodyActive = false
 					movingPieces[i] = nil
 					checkCompleted()
@@ -84,7 +85,7 @@ function everySecond(event)
 
 	for i,piece in pairs(movingPieces) do
 		if not (piece==nil) then
-			print(i .. " is still alive " .. piece.shape.myName)
+			print(i .. " is still alive " .. piece.shape.myName .. " - " .. (display.contentHeight - piece.shape.y) .. " - " .. piece.shape.height)
 		end
 	end
 	print("foo")
@@ -145,6 +146,12 @@ local function setupCollision( body )
 					if self.isBodyActive == true then
 						self.isBodyActive = false
 						removeFromMoving(self)
+						local function removeBody(_ev)
+							print("Removing " .. body.myName)
+							body:removeSelf()
+							
+						end
+						timer.performWithDelay(100, removeBody, 1)
 						checkCompleted()
 					end
 				end
