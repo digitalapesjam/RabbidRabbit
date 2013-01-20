@@ -31,7 +31,6 @@ end
 --		 unless storyboard.removeScene() is called.
 -- 
 -----------------------------------------------------------------------------------------
-
 local function createButton(text,x,y,width,height) 
       button = display.newRoundedRect(x,y,width,height,20)
     button.alpha = 0.8
@@ -56,6 +55,7 @@ local function updateAnimations()
   
 end
 
+
 -- Called when the scene's view does not exist:
 function scene:createScene( event )
 	group = self.view
@@ -68,7 +68,8 @@ function scene:createScene( event )
 	
   playBtn = createButton("Play",display.contentWidth*0.75-300,display.contentHeight/2 + 100,400,500)
 	
-  playBtn:addEventListener( "touch", playFunction )
+  -- playBtn:addEventListener( "touch", playFunction )
+  playBtn:addEventListener( "touch", onPlayBtnRelease )
   Runtime:addEventListener( "enterFrame", updateAnimations )
 --	group:insert( titleLogo )
 end

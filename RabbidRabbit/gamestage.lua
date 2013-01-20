@@ -15,7 +15,7 @@ screenW, screenH, halfW = display.contentWidth, display.contentHeight, display.c
 
 function scene:createScene( event )
 	local group = self.view
-	--physics.setDrawMode("hybrid")	
+	-- physics.setDrawMode("hybrid")	
 
   -- background
 	local background = display.newImageRect( "Images/stagebg.jpg", display.contentWidth, display.contentHeight )
